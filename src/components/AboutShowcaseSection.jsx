@@ -59,7 +59,7 @@ const sliderItems = [
     description:
       'Projects executed with strict planning and milestone tracking to maintain reliable delivery timelines',
   },
-   {
+  {
     type: 'image',
     image: '/shivgroup/images/project/project-3.jpg',
     alt: 'Road infrastructure construction project',
@@ -70,6 +70,18 @@ const sliderItems = [
     title: 'YEARS OF EXPERIENCE',
     description:
       'Decades of dependable execution across infrastructure, construction, and property development projects',
+  },
+  {
+    type: 'image',
+    image: '/shivgroup/images/project/project-1.jpg',
+    alt: 'Construction project showcase',
+  },
+  {
+    type: 'darkStat',
+    value: '100%',
+    title: 'CLIENT SATISFACTION',
+    description:
+      'Our commitment to quality ensures every client is satisfied with the end result of their project',
   },
 ];
 
@@ -99,7 +111,7 @@ const AboutShowcaseSection = () => {
         </div>
       </div>
 
-      <div className="relative mt-10 -ml-[50vw] -mr-[50vw]">
+      <div className="relative mt-10">
         <Swiper
           modules={[Autoplay]}
           loop

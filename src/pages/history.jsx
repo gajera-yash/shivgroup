@@ -26,7 +26,7 @@ const History = () => {
       <section
         className="relative pb-20 md:pb-10"
         style={{
-          backgroundImage: "url('/shivgroup/images/page_title_bg.jpg')",
+          backgroundImage: "url('images/page_title_bg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -47,7 +47,7 @@ const History = () => {
       </section>
 
       {/* History Content */}
-      <section className="w-full bg-white pb-[70px] lg:pb-[110px]">
+      <section className="w-full bg-white pb-[70px] lg:pb-[110px] overflow-hidden">
         <div className="max-w-full mx-auto">
           <div className="bg-[#eeefe6] flex flex-col lg:flex-row items-stretch pt-10 lg:pt-[84px] pb-10 lg:pb-[120px] px-4 sm:px-8 md:px-12 lg:px-[131px] gap-8 lg:gap-[30px]">
             
@@ -138,7 +138,7 @@ const History = () => {
       </section>
 
       {/* Decades of Excellence Section */}
-      <section className="w-full bg-[#fff] py-[100px] px-4 md:px-8 lg:px-[135px]">
+      <section className="w-full bg-[#fff] py-[100px] px-4 md:px-8 lg:px-[135px] overflow-hidden">
         <div className="max-w-[1920px] mx-auto">
           
           {/* Main Title - Only once at the top */}

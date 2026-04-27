@@ -71,7 +71,7 @@ const OurStorySection = () => {
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={`gallery-${safeIndex}`}
-            className="mt-8 md:mt-10 flex gap-4 md:gap-[30px] overflow-x-auto pb-2"
+            className="mt-8 md:mt-10 flex gap-4 md:gap-[30px] overflow-x-auto pb-2 hide-scrollbar"
             variants={imageVariants}
             custom={direction}
             initial="enter"

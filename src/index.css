@@ -36,6 +36,7 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   body {
@@ -43,6 +44,8 @@
     color: var(--color-text-dark);
     background-color: var(--color-light);
     overflow-x: hidden;
+    width: 100%;
+    position: relative;
   }
 
   h1,
@@ -154,6 +157,15 @@
 
   .animate-float {
     animation: float 3s ease-in-out infinite;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
 
