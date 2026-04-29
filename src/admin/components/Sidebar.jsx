@@ -1,5 +1,6 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../../utils/api';
 import {
   HiOutlineHome,
   HiOutlinePhotograph,
@@ -28,6 +29,21 @@ const menuItems = [
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await api.post('logout');
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      onClose?.();
+      navigate('/admin/login');
+    } catch (error) {
+      // Even if API fails, continue local logout to avoid stuck session UI
+      alert(err.response?.data?.message || 'Logout failed')
+    }
+  };
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -88,7 +104,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Bottom section */}
       <div className="px-3 pb-4 border-t border-[#1e293b] pt-4">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold text-slate-400 hover:text-red-400 hover:bg-red-500/5 transition-all duration-200">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold text-slate-400 hover:text-red-400 hover:bg-red-500/5 transition-all duration-200"
+        >
           <HiOutlineLogout className="w-[18px] h-[18px]" />
           <span>Logout</span>
         </button>

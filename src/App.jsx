@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { ReactLenis } from 'lenis/react';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
@@ -24,6 +24,26 @@ import TestimonialManager from './admin/pages/TestimonialManager';
 import AwardsManager from './admin/pages/AwardsManager';
 import InquiryManager from './admin/pages/InquiryManager';
 import SiteSettings from './admin/pages/SiteSettings';
+
+const AdminProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const userRaw = localStorage.getItem('user');
+
+  let isAdmin = false;
+
+  try {
+    const user = userRaw ? JSON.parse(userRaw) : null;
+    isAdmin = !!token && Number(user?.role_id) === 1;
+  } catch {
+    isAdmin = false;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/admin/login" replace state={{ message: 'Please login first as admin.' }} />;
+  }
+
+  return children;
+};
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -65,7 +85,7 @@ function App() {
 
         {/* Admin Panel */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="homepage" element={<HomepageManager />} />
           <Route path="about" element={<AboutManager />} />

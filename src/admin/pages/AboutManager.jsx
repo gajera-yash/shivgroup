@@ -48,25 +48,6 @@ const AboutManager = () => {
         </div>
       </motion.div>
 
-      {/* About Showcase Section */}
-      <motion.div variants={item} className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100">
-          <h3 className="text-[15px] font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Showcase Stats</h3>
-          <p className="text-xs text-slate-400 mt-0.5">Edit the statistics and slider items on the About page</p>
-        </div>
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {['400+', '₹1.5B+', '25+', '98%'].map((val, i) => (
-            <div key={i} className="p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
-              <input type="text" defaultValue={val} className="w-full text-2xl font-bold text-slate-800 bg-transparent outline-none border-b border-transparent focus:border-[#AB2F2F] pb-1 transition-colors" />
-              <input type="text" defaultValue={['Completed Projects', 'Project Value', 'Years Experience', 'On-Time Delivery'][i]} className="w-full text-xs text-slate-500 bg-transparent outline-none mt-2" />
-            </div>
-          ))}
-        </div>
-        <div className="px-6 pb-6">
-          <button className="px-6 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 transition-colors">Save Changes</button>
-        </div>
-      </motion.div>
-
       {/* Add Milestone Modal */}
       <Modal isOpen={showAddMilestone} onClose={() => setShowAddMilestone(false)} title="Add Milestone" subtitle="Add a new year milestone to the Our Story section" size="lg">
         <form onSubmit={(e) => { e.preventDefault(); setShowAddMilestone(false); }} className="space-y-4">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import api from '../../utils/api';
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
 const Login = () => {
@@ -9,16 +10,40 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const infoMessage = location.state?.message;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login
-    setTimeout(() => {
-      localStorage.setItem('admin_auth', 'true');
+
+
+    try {
+      const res = await api.post('login', { email, password });
+      const user = res?.data?.data?.user;
+      const token = res?.data?.data?.token;
+
+      if (!token || !token.trim()) {
+        alert('Token missing. Please login again.');
+        return;
+      }
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      if (Number(user?.role_id) === 1) {
+        navigate('/admin');
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        alert('Access denied. Admin login required.');
+      }
+
+    } catch (err) {
+      alert(err.response?.data?.message || 'Login failed');
+    } finally {
       setIsLoading(false);
-      navigate('/admin');
-    }, 1000);
+    }
   };
 
   return (
@@ -84,6 +109,11 @@ const Login = () => {
             <p className="text-slate-500 text-sm mt-1.5 font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               Sign in to access your admin dashboard
             </p>
+            {infoMessage && (
+              <p className="mt-3 text-xs font-semibold text-[#AB2F2F]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                {infoMessage}
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">

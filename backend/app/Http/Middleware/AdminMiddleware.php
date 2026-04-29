@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
@@ -16,15 +15,16 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $user = $request->user();
 
-        if (!Auth::check()) {
+        if (!$user) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
-        if (Auth::user()->role_id !== 1) {
+        if ((int) $user->role_id !== 1) {
             return response()->json([
                 'status' => false,
                 'message' => 'Access denied. Admin only.'
