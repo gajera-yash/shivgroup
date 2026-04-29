@@ -8,21 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 
-class Partner extends Model
+class Award extends Model
 {
     use HasFactory;
 
-    protected $table = 'partners';
+    protected $table = "awards";
 
     protected $fillable = [
-        'partner_name',
-        'partner_image',
+        'award_title',
+        'organization',
+        'year',
+        'award_image',
         'status',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function partnerImage(): Attribute
+    public function awardImage(): Attribute
     {
         return Attribute::make(
             get: fn($value) => $value ? Storage::url($value) : null,

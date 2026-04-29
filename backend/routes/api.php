@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\v1\HomeBannersController;
+use App\Http\Controllers\Api\v1\AwardsController;
+use App\Http\Controllers\Api\v1\PartnersController;
 use App\Http\Controllers\Api\v1\TestimonialsController;
 use App\Http\Controllers\Api\v1\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +24,18 @@ Route::prefix('v1')->group(function () {
         Route::post('add-testimonials', [TestimonialsController::class, 'store']);
         Route::get('fetch-testimonials/{edit}', [TestimonialsController::class, 'fetch']);
         Route::get('delete-testimonials/{delete}', [TestimonialsController::class, 'destroy']);
+
+        // Partners
+        Route::get('partners', [PartnersController::class, 'index']);
+        Route::post('add-partners', [PartnersController::class, 'store']);
+        Route::get('fetch-partners/{edit}', [PartnersController::class, 'fetch']);
+        Route::get('delete-partners/{delete}', [PartnersController::class, 'destroy']);
+
+        // Awards
+        Route::get('awards', [AwardsController::class, 'index']);
+        Route::post('add-awards', [AwardsController::class, 'store']);
+        Route::get('fetch-awards/{edit}', [AwardsController::class, 'fetch']);
+        Route::get('delete-awards/{delete}', [AwardsController::class, 'destroy']);
 
         // About Us
         // Route::get('about-us', [AboutUsController::class, 'index']);
