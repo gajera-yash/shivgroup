@@ -416,7 +416,7 @@ const AwardsManager = () => {
             <FormInput label="Organization" required placeholder="e.g. National Builder Awards" value={awardOrganization} onChange={(e) => setAwardOrganization(e.target.value)} />
             <FormInput label="Year" required placeholder="e.g. 2024" type="number" value={awardYear} onChange={(e) => setAwardYear(e.target.value)} />
           </div>
-          <FormImageUpload label="Award Certificate / Image (Optional)" onImageSelect={setAwardImage} />
+          <FormImageUpload label="Award Certificate / Image" onImageSelect={setAwardImage} />
           <FormSelect
             label="Status"
             value={awardStatus}
@@ -436,7 +436,7 @@ const AwardsManager = () => {
             <FormInput label="Organization" required value={editAwardOrganization} onChange={(e) => setEditAwardOrganization(e.target.value)} />
             <FormInput label="Year" required type="number" value={editAwardYear} onChange={(e) => setEditAwardYear(e.target.value)} />
           </div>
-          <FormImageUpload label="Award Certificate / Image (Optional)" initialPreview={editAwardImagePreview} onImageSelect={setEditAwardImage} />
+          <FormImageUpload label="Award Certificate / Image " initialPreview={editAwardImagePreview} onImageSelect={setEditAwardImage} />
           <FormSelect
             label="Status"
             value={editAwardStatus}
@@ -468,7 +468,7 @@ const AwardsManager = () => {
         <form onSubmit={handleEditPartner} className="space-y-4">
           {editPartnerError && <div className="px-3 py-2 rounded-lg bg-red-50 border border-red-100 text-red-600 text-xs font-semibold">{editPartnerError}</div>}
           <FormInput label="Partner / Client Name" required value={editPartnerName} onChange={(e) => setEditPartnerName(e.target.value)} />
-          <FormImageUpload label="Company Logo (Optional)" initialPreview={editPartnerImagePreview} onImageSelect={setEditPartnerImage} />
+          <FormImageUpload label="Company Logo " initialPreview={editPartnerImagePreview} onImageSelect={setEditPartnerImage} />
           <FormSelect
             label="Status"
             value={editPartnerStatus}

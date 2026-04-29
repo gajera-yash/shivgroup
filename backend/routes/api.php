@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\v1\HomeBannersController;
 use App\Http\Controllers\Api\v1\AwardsController;
+use App\Http\Controllers\Api\v1\AboutUsController;
 use App\Http\Controllers\Api\v1\PartnersController;
 use App\Http\Controllers\Api\v1\TestimonialsController;
 use App\Http\Controllers\Api\v1\UsersController;
@@ -38,7 +39,9 @@ Route::prefix('v1')->group(function () {
         Route::get('delete-awards/{delete}', [AwardsController::class, 'destroy']);
 
         // About Us
-        // Route::get('about-us', [AboutUsController::class, 'index']);
-        // Route::post('add-about-us', [AboutUsController::class, 'store']);
+        Route::get('about-us', [AboutUsController::class, 'index']);
+        Route::post('add-about-us', [AboutUsController::class, 'store']);
+        Route::get('fetch-about-us/{edit}', [AboutUsController::class, 'fetch']);
+        Route::get('delete-about-us/{delete}', [AboutUsController::class, 'destroy']);
     });
 });
