@@ -10,6 +10,9 @@ const AddService = () => {
   const [includedItems, setIncludedItems] = useState(['']);
   const [rulesItems, setRulesItems] = useState(['']);
   const [brochures, setBrochures] = useState([{ name: '', file: null }]);
+  const [workingProcess, setWorkingProcess] = useState([
+    { title: '', description: '', images: [] }
+  ]);
 
   const handleAddIncluded = () => setIncludedItems([...includedItems, '']);
   const handleRemoveIncluded = (index) => setIncludedItems(includedItems.filter((_, i) => i !== index));
