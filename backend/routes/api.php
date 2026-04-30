@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\v1\ServicesController;
 use App\Http\Controllers\Api\v1\GeneralInformationController;
 use App\Http\Controllers\Api\v1\SocialMediaController;
 use App\Http\Controllers\Api\v1\InquiriesController;
+use App\Http\Controllers\Api\v1\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -22,6 +23,9 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('logout', [UsersController::class, 'logout']);
+
+        // Dashboard
+        Route::get('dashboard-stats', [DashboardController::class, 'index']);
 
         // Home Banners
         Route::get('home-banners', [HomeBannersController::class, 'index']);

@@ -84,7 +84,6 @@ const InquiryManager = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-bold text-slate-800">Details</h3>
                   <div className="flex gap-1">
-                    <button className="p-2 rounded-lg hover:bg-blue-50 text-slate-400 hover:text-blue-500" title="Reply"><HiOutlineReply className="w-4 h-4" /></button>
                     <button onClick={() => handleDelete(selected.id)} className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500" title="Delete"><HiOutlineTrash className="w-4 h-4" /></button>
                   </div>
                 </div>
