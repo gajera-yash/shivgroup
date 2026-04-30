@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
+            $table->foreignId('project_category_id')->constrained('project_categories')->onDelete('cascade');
             $table->string('title');
             $table->integer('status')->default(0);
             $table->string('project_image');
-            $table->json('tags');
-            $table->longText('description');
-            $table->string('map_link');
+            $table->json('tags')->nullable();
+            $table->longText('description')->nullable();
+            $table->string('map_link')->nullable();
             $table->timestamps();
         });
     }

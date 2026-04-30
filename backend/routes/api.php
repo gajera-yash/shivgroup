@@ -5,13 +5,20 @@ use App\Http\Controllers\Api\v1\AwardsController;
 use App\Http\Controllers\Api\v1\AboutUsController;
 use App\Http\Controllers\Api\v1\PartnersController;
 use App\Http\Controllers\Api\v1\ProjectCategoriesController;
+use App\Http\Controllers\Api\v1\ProjectsController;
 use App\Http\Controllers\Api\v1\TestimonialsController;
 use App\Http\Controllers\Api\v1\UsersController;
 use App\Http\Controllers\Api\v1\ServicesController;
+use App\Http\Controllers\Api\v1\GeneralInformationController;
+use App\Http\Controllers\Api\v1\SocialMediaController;
+use App\Http\Controllers\Api\v1\InquiriesController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::post('login', [UsersController::class, 'login']);
+
+    // Public Inquiries
+    Route::post('add-inquiries', [InquiriesController::class, 'store']);
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('logout', [UsersController::class, 'logout']);
@@ -57,5 +64,24 @@ Route::prefix('v1')->group(function () {
         Route::post('add-project-categories', [ProjectCategoriesController::class, 'store']);
         Route::get('fetch-project-categories/{edit}', [ProjectCategoriesController::class, 'fetch']);
         Route::get('delete-project-categories/{delete}', [ProjectCategoriesController::class, 'destroy']);
+
+        // Projects
+        Route::get('projects', [ProjectsController::class, 'index']);
+        Route::post('add-projects', [ProjectsController::class, 'store']);
+        Route::get('fetch-projects/{edit}', [ProjectsController::class, 'fetch']);
+        Route::get('delete-projects/{delete}', [ProjectsController::class, 'destroy']);
+
+        // General Information
+        Route::get('general-information', [GeneralInformationController::class, 'index']);
+        Route::post('add-general-information', [GeneralInformationController::class, 'store']);
+
+        // Social Media
+        Route::get('social-media', [SocialMediaController::class, 'index']);
+        Route::post('add-social-media', [SocialMediaController::class, 'store']);
+
+        // Inquiries (Contact Us)
+        Route::get('inquiries', [InquiriesController::class, 'index']);
+        Route::get('fetch-inquiries/{fetch}', [InquiriesController::class, 'fetch']);
+        Route::get('delete-inquiries/{delete}', [InquiriesController::class, 'destroy']);
     });
 });

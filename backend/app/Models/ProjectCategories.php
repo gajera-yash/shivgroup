@@ -15,8 +15,8 @@ class ProjectCategories extends Model
 
     protected $hidden = ['created_at','updated_at'];
 
-    // public function projects()
-    // {
-    //     return $this->hasMany(Projects::class);
-    // }
+    public function projects()
+    {
+        return $this->hasMany(Project::class,'project_category_id','id');
+    }
 }

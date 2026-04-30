@@ -1,15 +1,84 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowUpRight, FiUser, FiMail, FiPhone, FiUploadCloud, FiMessageSquare } from 'react-icons/fi';
+import api from '../utils/api';
 
 const Contact = () => {
+  const [generalInfo, setGeneralInfo] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    mobile: '',
+    subject: '',
+    message: ''
+  });
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
+
+  useEffect(() => {
+    fetchGeneralInfo();
+  }, []);
+
+  const fetchGeneralInfo = async () => {
+    try {
+      const res = await api.get('general-information');
+      if (res?.data?.data) {
+        setGeneralInfo(res.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch general info:', err);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
     }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setStatusMsg({ type: '', text: '' });
+
+    try {
+      const fd = new FormData();
+      fd.append('name', formData.name);
+      fd.append('email', formData.email);
+      fd.append('mobile', formData.mobile);
+      fd.append('subject', formData.subject);
+      fd.append('message', formData.message);
+      if (selectedFile) {
+        fd.append('attachment', selectedFile);
+      }
+
+      const res = await api.post('add-inquiries', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      if (res?.data?.status === "success") {
+        setStatusMsg({ type: 'success', text: 'Thank you! Your request has been sent successfully.' });
+        setFormData({ name: '', email: '', mobile: '', subject: '', message: '' });
+        setSelectedFile(null);
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+      if (err?.response?.data?.errors) {
+        const firstError = Object.values(err.response.data.errors)[0][0];
+        setStatusMsg({ type: 'error', text: firstError });
+      } else {
+        setStatusMsg({ type: 'error', text: err?.response?.data?.message || 'Failed to send request. Please try again.' });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-[#f5f5f5] min-h-screen">
       {/* Page Hero */}
@@ -47,12 +116,16 @@ const Contact = () => {
               BUILD WITH CONFIDENCE. BUILD WITH US.
             </h2>
             
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative group">
                   <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" />
                   <input 
                     type="text" 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
                     placeholder="Your Name*" 
                     className="w-full bg-transparent border border-gray-700 p-3 pl-12 text-sm text-white focus:border-gray-400 outline-none transition-all placeholder:text-gray-500" 
                   />
@@ -61,6 +134,10 @@ const Contact = () => {
                   <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" />
                   <input 
                     type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                     placeholder="Email Address*" 
                     className="w-full bg-transparent border border-gray-700 p-3 pl-12 text-sm text-white focus:border-gray-400 outline-none transition-all placeholder:text-gray-500" 
                   />
@@ -72,6 +149,10 @@ const Contact = () => {
                   <FiPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" />
                   <input 
                     type="text" 
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    required
                     placeholder="Contact No*" 
                     className="w-full bg-transparent border border-gray-700 p-3 pl-12 text-sm text-white focus:border-gray-400 outline-none transition-all placeholder:text-gray-500" 
                   />
@@ -96,7 +177,11 @@ const Contact = () => {
                 <FiMessageSquare className="absolute left-4 top-4 text-gray-500 group-focus-within:text-white transition-colors" />
                 <input 
                   type="text" 
-                  placeholder="What are you needs?*" 
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  placeholder="What are your needs?*" 
                   className="w-full bg-transparent border border-gray-700 p-3 pl-12 text-sm text-white focus:border-gray-400 outline-none transition-all placeholder:text-gray-500" 
                 />
               </div>
@@ -104,15 +189,29 @@ const Contact = () => {
               <div className="relative group">
                 <FiMessageSquare className="absolute left-4 top-4 text-gray-500 group-focus-within:text-white transition-colors" />
                 <textarea 
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
                   placeholder="How Can We Help You?*" 
                   rows="4" 
                   className="w-full bg-transparent border border-gray-700 p-3 pl-12 text-sm text-white focus:border-gray-400 outline-none transition-all resize-none placeholder:text-gray-500"
                 ></textarea>
               </div>
 
+              {statusMsg.text && (
+                <p className={`text-xs font-bold uppercase tracking-wider ${statusMsg.type === 'success' ? 'text-emerald-500' : 'text-red-500'}`}>
+                  {statusMsg.text}
+                </p>
+              )}
+
               <div className="pt-4">
-                <button className="bg-white text-black hover:bg-primary hover:text-white flex items-center gap-6 pl-10 pr-2 py-2 rounded-full font-heading font-bold tracking-widest text-[13px] transition-all duration-500 group uppercase">
-                  SEND REQUEST
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-white text-black hover:bg-primary hover:text-white flex items-center gap-6 pl-10 pr-2 py-2 rounded-full font-heading font-bold tracking-widest text-[13px] transition-all duration-500 group uppercase disabled:opacity-50"
+                >
+                  {isSubmitting ? 'SENDING...' : 'SEND REQUEST'}
                   <span className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white transition-transform duration-500 group-hover:rotate-45">
                      <FiArrowUpRight className="text-xl" />
                   </span>
@@ -168,22 +267,11 @@ const Contact = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                city: "San Francisco, USA",
-                phone: "+1 (0) 561 555 7689",
-                email: "bizox@usadomain.com",
+                city: "Main Office",
+                location: generalInfo?.address || "SURAT, GUJARAT, INDIA",
+                phone: generalInfo?.mobile || "+91 123 456 7890",
+                email: generalInfo?.email || "shivgroup@yahoo.co.in",
                 image: "/shivgroup/images/project/project-1.jpg"
-              },
-              {
-                city: "Toronto, Canada",
-                phone: "+1 (416) 123-4567",
-                email: "bizox@usadomain.com",
-                image: "/shivgroup/images/project/project-2.jpg"
-              },
-              {
-                city: "London, United Kingdom",
-                phone: "+44 (20) 7946 0958",
-                email: "bizox@usadomain.com",
-                image: "/shivgroup/images/project/project-3.jpg"
               }
             ].map((office, idx) => (
               <motion.div 
@@ -201,10 +289,11 @@ const Contact = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                   />
                 </div>
-                <div className="text-center mb-8">
+                <div className="text-center mb-8 px-4">
                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">{office.city}</p>
-                   <h4 className="text-[22px] font-bold text-black mb-1">{office.phone}</h4>
-                   <p className="text-gray-600 text-sm font-medium">{office.email}</p>
+                   <h4 className="text-[20px] font-bold text-black mb-1">{office.phone}</h4>
+                   <p className="text-gray-600 text-sm font-medium mb-2">{office.email}</p>
+                   <p className="text-gray-500 text-xs uppercase font-bold tracking-wider leading-relaxed">{office.location}</p>
                 </div>
                 <button className="w-full bg-[#AB2F2F] text-white flex items-center justify-between pl-8 pr-2 py-2 rounded-full font-heading font-bold uppercase tracking-widest text-[11px] transition-all duration-500 hover:bg-[#8B2424] group">
                   CLICK TO SEE LOCATION
