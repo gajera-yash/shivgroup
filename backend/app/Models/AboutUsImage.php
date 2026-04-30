@@ -5,34 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 
-class Partner extends Model
+class AboutUsImage extends Model
 {
     use HasFactory;
 
-    protected $table = 'partners';
+    protected $table = "about_us_images";
 
     protected $fillable = [
-        'partner_name',
-        'partner_image',
-        'status',
+        'aboutus_id',
+        'about_image',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function partnerImage(): Attribute
+    public function aboutImage(): Attribute
     {
         return Attribute::make(
             get: fn($value) => $value ? Storage::url($value) : null,
         );
     }
 
-    public function id(): Attribute
+    public function aboutUs()
     {
-        return Attribute::make(
-            get: fn($value) => $value ? Crypt::encrypt($value) : null,
-        );
+        return $this->belongsTo(AboutUs::class, 'aboutus_id');
     }
 }
