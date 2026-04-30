@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\v1\AboutUsController;
 use App\Http\Controllers\Api\v1\PartnersController;
 use App\Http\Controllers\Api\v1\TestimonialsController;
 use App\Http\Controllers\Api\v1\UsersController;
+use App\Http\Controllers\Api\v1\ServicesController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -43,5 +44,11 @@ Route::prefix('v1')->group(function () {
         Route::post('add-about-us', [AboutUsController::class, 'store']);
         Route::get('fetch-about-us/{edit}', [AboutUsController::class, 'fetch']);
         Route::get('delete-about-us/{delete}', [AboutUsController::class, 'destroy']);
+
+        // Services
+        Route::get('services', [ServicesController::class, 'index']);
+        Route::post('add-services', [ServicesController::class, 'store']);
+        Route::get('fetch-services/{edit}', [ServicesController::class, 'fetch']);
+        Route::get('delete-services/{delete}', [ServicesController::class, 'destroy']);
     });
 });
