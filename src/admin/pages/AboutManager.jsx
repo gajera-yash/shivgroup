@@ -127,7 +127,11 @@ const AboutManager = () => {
       fd.append('title', title.trim());
       fd.append('description', description.trim());
       fd.append('status', status === 'active' ? '1' : '0');
-      images.filter(Boolean).forEach((img) => fd.append('about_image[]', img));
+      images.forEach((img, index) => {
+        if (img) {
+          fd.append(`about_image_${index}`, img);
+        }
+      });
 
       const res = await api.post('add-about-us', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -187,7 +191,6 @@ const AboutManager = () => {
       fd.append('status', editStatus === 'active' ? '1' : '0');
       editImages.forEach((img, index) => {
         if (img) {
-          // આનાથી લારાવેલને 'about_image_0', 'about_image_1' એવી રીતે મળશે
           fd.append(`about_image_${index}`, img);
         }
       });
