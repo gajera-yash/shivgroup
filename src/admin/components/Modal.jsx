@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiOutlineX } from 'react-icons/hi';
+import { HiOutlineX, HiOutlinePlus } from 'react-icons/hi';
 
 const Modal = ({ isOpen, onClose, title, subtitle, children, size = 'md' }) => {
   const sizes = {
@@ -158,6 +158,55 @@ export const FormImageUpload = ({ label, initialPreview = null, onImageSelect })
           onChange={handleImageChange}
         />
       </div>
+    </div>
+  );
+};
+
+export const FormTagInput = ({ label, tags = [], onAddTag, onRemoveTag, placeholder = "Add tag..." }) => {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && inputValue.trim()) {
+      e.preventDefault();
+      onAddTag(inputValue.trim());
+      setInputValue('');
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-bold text-slate-600 mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        {label}
+      </label>
+      <div className="flex flex-wrap gap-2 p-2 bg-slate-50 border border-slate-200 rounded-xl min-h-[46px] focus-within:ring-2 focus-within:ring-[#AB2F2F]/20 focus-within:border-[#AB2F2F] transition-all">
+        {tags.map((tag, index) => (
+          <span 
+            key={index} 
+            className="flex items-center gap-1 px-2.5 py-1 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-600 shadow-sm animate-in fade-in zoom-in duration-200"
+          >
+            {tag}
+            <button 
+              type="button" 
+              onClick={() => onRemoveTag(index)}
+              className="p-0.5 hover:bg-slate-100 rounded-md text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <HiOutlineX className="w-3 h-3" />
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={tags.length === 0 ? placeholder : ""}
+          className="flex-1 bg-transparent border-none outline-none text-sm px-2 py-1 min-w-[120px] text-slate-800 placeholder:text-slate-400"
+          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+        />
+      </div>
+      <p className="text-[10px] text-slate-400 mt-1.5 flex items-center gap-1 px-1">
+        Press <span className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500 font-bold">Enter</span> to add a new tag.
+      </p>
     </div>
   );
 };

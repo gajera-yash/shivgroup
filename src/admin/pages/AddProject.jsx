@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineArrowLeft, HiOutlinePlus, HiOutlineTrash } from 'react-icons/hi';
-import { FormInput, FormTextarea, FormImageUpload, FormActions, FormSelect } from '../components/Modal';
+import { FormInput, FormTextarea, FormImageUpload, FormActions, FormSelect, FormTagInput } from '../components/Modal';
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -10,6 +10,17 @@ const AddProject = () => {
   // Dynamic form state
   const [projectDetails, setProjectDetails] = useState(['']);
   const [projectSections, setProjectSections] = useState([{ title: '', description: '', image: null }]);
+  const [tags, setTags] = useState([]);
+
+  const handleAddTag = (newTag) => {
+    if (!tags.includes(newTag)) {
+      setTags([...tags, newTag]);
+    }
+  };
+
+  const handleRemoveTag = (index) => {
+    setTags(tags.filter((_, i) => i !== index));
+  };
 
   const handleAddDetail = () => setProjectDetails([...projectDetails, '']);
   const handleDetailChange = (index, value) => {
@@ -38,6 +49,7 @@ const AddProject = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Save logic here
+    console.log({ projectDetails, projectSections, tags });
     navigate('/admin/projects');
   };
 
@@ -83,7 +95,13 @@ const AddProject = () => {
                     { value: 'Draft', label: 'Draft' },
                   ]} />
                 </div>
-                <FormInput label="Tags" placeholder="e.g. Modern, Eco-friendly, High-rise (comma separated)" />
+                <FormTagInput 
+                  label="Project Tags" 
+                  tags={tags} 
+                  onAddTag={handleAddTag} 
+                  onRemoveTag={handleRemoveTag}
+                  placeholder="e.g. Modern, Eco-friendly, High-rise"
+                />
               </div>
               <div className="lg:col-span-1 h-full flex flex-col justify-start">
                 <FormImageUpload label="Project Main Image" />

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { HiOutlineGlobeAlt, HiOutlinePhone, HiOutlineMail, HiOutlinePhotograph } from 'react-icons/hi';
+import { HiOutlineGlobeAlt, HiOutlinePhone, HiOutlineMail, HiOutlinePhotograph, HiOutlineTrash } from 'react-icons/hi';
 import { FaFacebookF, FaLinkedinIn, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { FormImageUpload } from '../components/Modal';
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } };
 const item = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
@@ -13,37 +14,36 @@ const SiteSettings = () => {
         <div className="px-6 py-4 border-b border-slate-100">
           <h3 className="text-[15px] font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>General Settings</h3>
         </div>
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5">Company Name</label>
-            <input type="text" defaultValue="Shiv Group" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5">Tagline</label>
-            <input type="text" defaultValue="Building The Future" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5">Phone Number</label>
-            <input type="text" defaultValue="+91 123 456 7890" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5">Email Address</label>
-            <input type="text" defaultValue="shivgroup@yahoo.co.in" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-xs font-bold text-slate-600 mb-1.5">Office Address</label>
-            <input type="text" defaultValue="MARKET#203 SAN FRANCISCO, CALIFORNIA (CA)." className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-slate-600 mb-1.5">Logo</label>
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-14 rounded-xl bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center">
-                <img src="/shivgroup/images/Logo.png" alt="Logo" className="max-h-full max-w-full object-contain p-2" />
-              </div>
-              <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                <HiOutlinePhotograph className="w-4 h-4" /> Change Logo
-              </button>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Company Name</label>
+              <input type="text" defaultValue="Shiv Group" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
             </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Tagline</label>
+              <input type="text" defaultValue="Building The Future" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Phone Number</label>
+              <input type="text" defaultValue="+91 123 456 7890" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Email Address</label>
+              <input type="text" defaultValue="shivgroup@yahoo.co.in" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Office Address</label>
+              <input type="text" defaultValue="MARKET#203 SAN FRANCISCO, CALIFORNIA (CA)." className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F]" />
+            </div>
+          </div>
+
+          <div className="max-w-xs">
+            <FormImageUpload 
+              label="Website Logo" 
+              initialPreview="/shivgroup/images/Logo.png" 
+              onImageSelect={(file) => console.log('Selected logo:', file)}
+            />
           </div>
         </div>
         <div className="px-6 pb-6">
