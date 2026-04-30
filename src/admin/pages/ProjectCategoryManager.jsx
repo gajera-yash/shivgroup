@@ -1,19 +1,90 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HiOutlinePencil, HiOutlineTrash, HiOutlinePlus } from 'react-icons/hi';
 import Modal, { FormInput, FormActions, FormSelect } from '../components/Modal';
-
-const categoriesData = [
-  { id: 1, name: 'Commercial', status: 'Active' },
-  { id: 2, name: 'Residential', status: 'Active' },
-  { id: 3, name: 'Infrastructure', status: 'Active' },
-];
+import api from '../../utils/api';
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } };
 const item = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 const ProjectCategoryManager = () => {
   const [showAdd, setShowAdd] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [editId, setEditId] = useState(null);
+  const [name, setName] = useState('');
+  const [status, setStatus] = useState('1');
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.get('project-categories');
+      setCategories(res?.data?.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = (category) => {
+    setEditId(category.id);
+    setName(category.category_name);
+    setStatus(category.status.toString());
+    setShowAdd(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this category?')) return;
+    try {
+      const res = await api.get(`delete-project-categories/${id}`);
+      alert(res?.data?.message || 'Category deleted successfully.');
+      setCategories(prev => prev.filter(c => c.id !== id));
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to delete category.');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) return alert('Category Name is required.');
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        category_name: name.trim(),
+        status: status,
+      };
+      if (editId) payload.edit = editId;
+
+      const res = await api.post('add-project-categories', payload);
+      alert(res?.data?.message || 'Category saved successfully.');
+      setShowAdd(false);
+      fetchCategories();
+      resetForm();
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to save category.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setEditId(null);
+    setName('');
+    setStatus('1');
+  };
+
+  const closeModal = () => {
+    setShowAdd(false);
+    resetForm();
+  };
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
@@ -29,49 +100,73 @@ const ProjectCategoryManager = () => {
 
       <motion.div variants={item} className="bg-white border border-slate-100 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100 text-xs text-slate-500">
-                <th className="px-6 py-4 font-bold uppercase tracking-wider">Category Name</th>
-                <th className="px-6 py-4 font-bold uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 font-bold uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categoriesData.map((category) => (
-                <tr key={category.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-bold text-slate-800">{category.name}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${category.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>{category.status}</span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button className="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#AB2F2F] hover:border-[#AB2F2F]/30 hover:bg-red-50 transition-all">
-                        <HiOutlinePencil className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-red-500 hover:border-red-500/30 hover:bg-red-50 transition-all">
-                        <HiOutlineTrash className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+          {isLoading ? (
+            <div className="p-8 text-center text-sm font-semibold text-slate-500">Loading Categories...</div>
+          ) : (
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100 text-xs text-slate-500">
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider">Category Name</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 font-bold uppercase tracking-wider text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {categories.length > 0 ? categories.map((category) => (
+                  <tr key={category.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <p className="text-sm font-bold text-slate-800">{category.category_name}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${category.status == 1 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                        {category.status == 1 ? 'Active' : 'Draft'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEdit(category)} className="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-[#AB2F2F] hover:border-[#AB2F2F]/30 hover:bg-red-50 transition-all">
+                          <HiOutlinePencil className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleDelete(category.id)} className="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-red-500 hover:border-red-500/30 hover:bg-red-50 transition-all">
+                          <HiOutlineTrash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan="3" className="px-6 py-8 text-center text-sm font-semibold text-slate-500">No project categories found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </motion.div>
 
-      {/* Add Category Modal */}
-      <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} title="Add New Category" subtitle="Add a new project category to your portfolio" size="md">
-        <form onSubmit={(e) => { e.preventDefault(); setShowAdd(false); }} className="space-y-5">
-          <FormInput label="Category Name" required placeholder="e.g. Commercial" />
-          <FormSelect label="Status" options={[
-            { value: 'Active', label: 'Active' },
-            { value: 'Inactive', label: 'Inactive' },
-          ]} />
-          <FormActions onCancel={() => setShowAdd(false)} submitText="Save Category" />
+      {/* Add/Edit Category Modal */}
+      <Modal isOpen={showAdd} onClose={closeModal} title={editId ? "Edit Category" : "Add New Category"} subtitle={editId ? "Update your project category details" : "Add a new project category to your portfolio"} size="md">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <FormInput 
+            label="Category Name" 
+            required 
+            placeholder="e.g. Commercial" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+          />
+          <FormSelect 
+            label="Status" 
+            value={status} 
+            onChange={(e) => setStatus(e.target.value)}
+            options={[
+              { value: '1', label: 'Active' },
+              { value: '0', label: 'Draft' },
+            ]} 
+          />
+          <FormActions 
+            onCancel={closeModal} 
+            submitText={isSubmitting ? 'Saving...' : (editId ? "Update Category" : "Save Category")} 
+          />
         </form>
       </Modal>
     </motion.div>

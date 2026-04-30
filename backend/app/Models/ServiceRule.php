@@ -4,14 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Subservices extends Model
+class ServiceRule extends Model
 {
-    protected $table = "subservices";
+    protected $table = "service_rules";
 
-    protected $fillable = [
-        'service_id',
-        'description',
-    ];
+    protected $fillable = ['service_id', 'rule'];
 
     protected $hidden = ['created_at', 'updated_at'];
 

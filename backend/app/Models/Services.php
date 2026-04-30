@@ -31,4 +31,19 @@ class Services extends Model
     {
         return $this->hasMany(Subservices::class, 'service_id', 'id');
     }
+
+    public function service_rules()
+    {
+        return $this->hasMany(ServiceRule::class, 'service_id', 'id');
+    }
+
+    public function brochures()
+    {
+        return $this->hasMany(Brochures::class, 'service_id', 'id');
+    }
+
+    public function service_contents()
+    {
+        return $this->hasMany(ServiceContent::class, 'service_id', 'id');
+    }
 }

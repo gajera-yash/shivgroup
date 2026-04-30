@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\v1\HomeBannersController;
 use App\Http\Controllers\Api\v1\AwardsController;
 use App\Http\Controllers\Api\v1\AboutUsController;
 use App\Http\Controllers\Api\v1\PartnersController;
+use App\Http\Controllers\Api\v1\ProjectCategoriesController;
 use App\Http\Controllers\Api\v1\TestimonialsController;
 use App\Http\Controllers\Api\v1\UsersController;
 use App\Http\Controllers\Api\v1\ServicesController;
@@ -50,5 +51,11 @@ Route::prefix('v1')->group(function () {
         Route::post('add-services', [ServicesController::class, 'store']);
         Route::get('fetch-services/{edit}', [ServicesController::class, 'fetch']);
         Route::get('delete-services/{delete}', [ServicesController::class, 'destroy']);
+
+        // Project Categories
+        Route::get('project-categories', [ProjectCategoriesController::class, 'index']);
+        Route::post('add-project-categories', [ProjectCategoriesController::class, 'store']);
+        Route::get('fetch-project-categories/{edit}', [ProjectCategoriesController::class, 'fetch']);
+        Route::get('delete-project-categories/{delete}', [ProjectCategoriesController::class, 'destroy']);
     });
 });

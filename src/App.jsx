@@ -94,6 +94,7 @@ function App() {
           <Route path="about" element={<AboutManager />} />
           <Route path="services" element={<ServiceManager />} />
           <Route path="services/add" element={<AddService />} />
+          <Route path="services/edit/:id" element={<AddService />} />
           <Route path="projects" element={<ProjectManager />} />
           <Route path="projects/add" element={<AddProject />} />
           <Route path="project-categories" element={<ProjectCategoryManager />} />
