@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HiOutlinePencil, HiOutlineTrash, HiOutlinePlus, HiOutlineChevronDown, HiOutlineChevronUp } from 'react-icons/hi';
-import Modal, { FormInput, FormTextarea, FormImageUpload, FormActions } from '../components/Modal';
+import { Link } from 'react-router-dom';
+import Modal, { FormInput, FormActions } from '../components/Modal';
 
 const servicesData = [
   {
@@ -31,20 +32,14 @@ const item = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transiti
 
 const ServiceManager = () => {
   const [expandedId, setExpandedId] = useState(null);
-  const [showAddService, setShowAddService] = useState(false);
   const [showAddSubService, setShowAddSubService] = useState(false);
-  const [subServiceItems, setSubServiceItems] = useState(['']);
-
-  const addSubServiceField = () => setSubServiceItems([...subServiceItems, '']);
-  const removeSubServiceField = (idx) => setSubServiceItems(subServiceItems.filter((_, i) => i !== idx));
-
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
       <motion.div variants={item} className="flex items-center justify-between">
         <p className="text-slate-500 text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Manage all services displayed on the Services page</p>
-        <button onClick={() => setShowAddService(true)} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#AB2F2F] to-[#c93e3e] text-white text-xs font-bold rounded-xl hover:shadow-lg hover:shadow-red-500/20 transition-all">
+        <Link to="/admin/services/add" className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#AB2F2F] to-[#c93e3e] text-white text-xs font-bold rounded-xl hover:shadow-lg hover:shadow-red-500/20 transition-all">
           <HiOutlinePlus className="w-4 h-4" /> Add Service
-        </button>
+        </Link>
       </motion.div>
 
       <motion.div variants={item} className="space-y-3">
@@ -97,47 +92,6 @@ const ServiceManager = () => {
           </div>
         ))}
       </motion.div>
-
-      {/* Add Service Modal */}
-      <Modal isOpen={showAddService} onClose={() => { setShowAddService(false); setSubServiceItems(['']); }} title="Add New Service" subtitle="Create a new service category" size="lg">
-        <form onSubmit={(e) => { e.preventDefault(); setShowAddService(false); setSubServiceItems(['']); }} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput label="Service Title" required placeholder="e.g. CONSTRUCTION SOLUTIONS" />
-            <FormInput label="Short Description" required placeholder="Brief one-line description" />
-          </div>
-          <FormTextarea label="Full Description" rows={3} placeholder="Detailed description of this service category..." />
-          <FormImageUpload label="Service Image" />
-
-          {/* Dynamic Sub-Services */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-600" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Sub-Services</label>
-              <button type="button" onClick={addSubServiceField} className="flex items-center gap-1 text-xs font-semibold text-[#AB2F2F] hover:underline">
-                <HiOutlinePlus className="w-3 h-3" /> Add More
-              </button>
-            </div>
-            <div className="space-y-2">
-              {subServiceItems.map((_, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-slate-400 w-5 text-center flex-shrink-0">{idx + 1}</span>
-                  <input
-                    type="text"
-                    placeholder={`Sub-service name ${idx + 1}`}
-                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#AB2F2F]/20 focus:border-[#AB2F2F] transition-all"
-                  />
-                  {subServiceItems.length > 1 && (
-                    <button type="button" onClick={() => removeSubServiceField(idx)} className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors flex-shrink-0">
-                      <HiOutlineTrash className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <FormActions onCancel={() => { setShowAddService(false); setSubServiceItems(['']); }} submitText="Add Service" />
-        </form>
-      </Modal>
 
       {/* Add Sub-Service Modal */}
       <Modal isOpen={showAddSubService} onClose={() => setShowAddSubService(false)} title="Add Sub-Service" subtitle="Add a new sub-service item" size="sm">

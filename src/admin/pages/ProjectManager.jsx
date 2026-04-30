@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { HiOutlinePencil, HiOutlineTrash, HiOutlinePlus, HiOutlineEye, HiOutlineLocationMarker } from 'react-icons/hi';
-import Modal, { FormInput, FormTextarea, FormImageUpload, FormActions, FormSelect } from '../components/Modal';
 
 const projectsData = [
   { id: 1, title: 'HARBORLINE STUDIOS', category: 'Commercial', location: 'Mumbai', image: '/shivgroup/images/project/project-1.jpg', status: 'Published' },
@@ -15,7 +15,7 @@ const item = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transiti
 
 const ProjectManager = () => {
   const [filter, setFilter] = useState('All');
-  const [showAdd, setShowAdd] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
@@ -25,7 +25,7 @@ const ProjectManager = () => {
             <button key={cat} onClick={() => setFilter(cat)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${filter === cat ? 'bg-slate-800 text-white' : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'}`}>{cat}</button>
           ))}
         </div>
-        <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#AB2F2F] to-[#c93e3e] text-white text-xs font-bold rounded-xl hover:shadow-lg hover:shadow-red-500/20 transition-all self-start">
+        <button onClick={() => navigate('/admin/projects/add')} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#AB2F2F] to-[#c93e3e] text-white text-xs font-bold rounded-xl hover:shadow-lg hover:shadow-red-500/20 transition-all self-start">
           <HiOutlinePlus className="w-4 h-4" /> Add Project
         </button>
       </motion.div>
@@ -54,36 +54,6 @@ const ProjectManager = () => {
           </div>
         ))}
       </motion.div>
-
-      {/* Add Project Modal */}
-      <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} title="Add New Project" subtitle="Add a new project to your portfolio" size="lg">
-        <form onSubmit={(e) => { e.preventDefault(); setShowAdd(false); }} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput label="Project Title" required placeholder="e.g. HARBORLINE STUDIOS" />
-            <FormSelect label="Category" required options={[
-              { value: '', label: 'Select category' },
-              { value: 'Commercial', label: 'Commercial' },
-              { value: 'Residential', label: 'Residential' },
-              { value: 'Infrastructure', label: 'Infrastructure' },
-            ]} />
-            <FormInput label="Location" required placeholder="e.g. Mumbai, India" />
-            <FormSelect label="Status" options={[
-              { value: 'Published', label: 'Published' },
-              { value: 'Draft', label: 'Draft' },
-            ]} />
-            <FormInput label="Client Name" placeholder="e.g. ABC Corp" />
-            <FormInput label="Completion Date" type="date" />
-          </div>
-          <FormTextarea label="Description" rows={3} placeholder="Describe the project details, scope, and achievements..." />
-          <FormInput label="Google Maps Embed URL" placeholder="https://maps.google.com/..." />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormImageUpload label="Main Image" />
-            <FormImageUpload label="Gallery Image 2" />
-            <FormImageUpload label="Gallery Image 3" />
-          </div>
-          <FormActions onCancel={() => setShowAdd(false)} submitText="Add Project" />
-        </form>
-      </Modal>
     </motion.div>
   );
 };

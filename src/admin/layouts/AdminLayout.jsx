@@ -9,6 +9,7 @@ const pageTitles = {
   '/admin/about': 'About Us Manager',
   '/admin/services': 'Service Manager',
   '/admin/projects': 'Project Manager',
+  '/admin/project-categories': 'Project Categories',
   '/admin/testimonials': 'Testimonials Manager',
   '/admin/awards': 'Awards & Partners',
   '/admin/inquiries': 'Inquiries / Leads',

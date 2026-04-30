@@ -19,7 +19,10 @@ import Dashboard from './admin/pages/Dashboard';
 import HomepageManager from './admin/pages/HomepageManager';
 import AboutManager from './admin/pages/AboutManager';
 import ServiceManager from './admin/pages/ServiceManager';
+import AddService from './admin/pages/AddService';
 import ProjectManager from './admin/pages/ProjectManager';
+import AddProject from './admin/pages/AddProject';
+import ProjectCategoryManager from './admin/pages/ProjectCategoryManager';
 import TestimonialManager from './admin/pages/TestimonialManager';
 import AwardsManager from './admin/pages/AwardsManager';
 import InquiryManager from './admin/pages/InquiryManager';
@@ -90,7 +93,10 @@ function App() {
           <Route path="homepage" element={<HomepageManager />} />
           <Route path="about" element={<AboutManager />} />
           <Route path="services" element={<ServiceManager />} />
+          <Route path="services/add" element={<AddService />} />
           <Route path="projects" element={<ProjectManager />} />
+          <Route path="projects/add" element={<AddProject />} />
+          <Route path="project-categories" element={<ProjectCategoryManager />} />
           <Route path="testimonials" element={<TestimonialManager />} />
           <Route path="awards" element={<AwardsManager />} />
           <Route path="inquiries" element={<InquiryManager />} />
