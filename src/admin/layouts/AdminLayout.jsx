@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import AdminHeader from '../components/AdminHeader';
+import SessionTimeoutHandler from '../components/SessionTimeoutHandler';
 
 const pageTitles = {
   '/admin': 'Dashboard',
@@ -26,6 +27,7 @@ const AdminLayout = () => {
 
   return (
     <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+      <SessionTimeoutHandler />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
