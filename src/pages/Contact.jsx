@@ -46,6 +46,12 @@ const Contact = () => {
     setIsSubmitting(true);
     setStatusMsg({ type: '', text: '' });
 
+    if (formData.message.trim().length < 10) {
+      setStatusMsg({ type: 'error', text: 'Message must be at least 10 characters long.' });
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const fd = new FormData();
       fd.append('name', formData.name);

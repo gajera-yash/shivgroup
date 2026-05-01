@@ -79,6 +79,11 @@ const HomepageManager = () => {
       return;
     }
 
+    if (!slideSubtitle.trim()) {
+      setFormError('Subtitle text is required.');
+      return;
+    }
+
     if (!slideImage) {
       setFormError('Background image is required.');
       return;
@@ -163,6 +168,11 @@ const HomepageManager = () => {
 
     if (!editTitle.trim()) {
       setEditError('Slide title is required.');
+      return;
+    }
+
+    if (!editSubtitle.trim()) {
+      setEditError('Subtitle text is required.');
       return;
     }
 
@@ -292,6 +302,7 @@ const HomepageManager = () => {
           />
           <FormTextarea
             label="Subtitle Text"
+            required
             placeholder="e.g. FROM CONCEPT TO COMPLETION"
             rows={3}
             value={slideSubtitle}
@@ -336,6 +347,7 @@ const HomepageManager = () => {
           />
           <FormTextarea
             label="Subtitle Text"
+            required
             rows={3}
             value={editSubtitle}
             onChange={(e) => setEditSubtitle(e.target.value)}

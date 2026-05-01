@@ -12,7 +12,8 @@ const SiteSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneralSubmitting, setIsGeneralSubmitting] = useState(false);
   const [isSocialSubmitting, setIsSocialSubmitting] = useState(false);
-  const [isFooterSubmitting, setIsFooterSubmitting] = useState(false);
+  const [generalError, setGeneralError] = useState('');
+  const [socialError, setSocialError] = useState('');
   
   // General Form State
   const [companyName, setCompanyName] = useState('');
@@ -76,14 +77,26 @@ const SiteSettings = () => {
 
   const handleGeneralSubmit = async (e) => {
     e.preventDefault();
+    setGeneralError('');
+
+    if (!companyName.trim() || !tagline.trim() || !mobile.trim() || !email.trim() || !address.trim()) {
+      setGeneralError('Company Name, Tagline, Phone, Email and Address are required.');
+      return;
+    }
+    
+    if (!logoFile && !logoPreview) {
+      setGeneralError('Website Logo is required.');
+      return;
+    }
+
     setIsGeneralSubmitting(true);
     try {
       const fd = new FormData();
-      fd.append('company_name', companyName);
-      fd.append('tagline', tagline);
-      fd.append('mobile', mobile);
-      fd.append('email', email);
-      fd.append('address', address);
+      fd.append('company_name', companyName.trim());
+      fd.append('tagline', tagline.trim());
+      fd.append('mobile', mobile.trim());
+      fd.append('email', email.trim());
+      fd.append('address', address.trim());
       if (logoFile) {
         fd.append('company_logo', logoFile);
       }
@@ -94,7 +107,9 @@ const SiteSettings = () => {
       alert(res?.data?.message || 'Settings updated successfully.');
     } catch (err) {
       console.error('Failed to save settings:', err);
-      alert(err?.response?.data?.message || 'Failed to save settings.');
+      const apiErrors = err?.response?.data?.errors;
+      const firstValidationError = apiErrors ? Object.values(apiErrors)?.[0]?.[0] : null;
+      setGeneralError(firstValidationError || err?.response?.data?.message || 'Failed to save settings.');
     } finally {
       setIsGeneralSubmitting(false);
     }
@@ -102,19 +117,32 @@ const SiteSettings = () => {
 
   const handleSocialSubmit = async (e) => {
     e.preventDefault();
+    setSocialError('');
+
+    // URL Validation
+    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .?=@%&-]*)*\/?$/;
+    const invalidSocials = Object.entries(socialLinks).filter(([_, url]) => url && !urlPattern.test(url));
+    
+    if (invalidSocials.length > 0) {
+      setSocialError(`Invalid URL for ${invalidSocials.map(([p]) => p).join(', ')}`);
+      return;
+    }
+
     setIsSocialSubmitting(true);
     try {
       const payload = {
         socials: Object.keys(socialLinks).map(key => ({
           platform: key,
-          url: socialLinks[key]
+          url: socialLinks[key]?.trim() || ''
         }))
       };
       const res = await api.post('add-social-media', payload);
       alert(res?.data?.message || 'Social media links updated successfully.');
     } catch (err) {
       console.error('Failed to save social links:', err);
-      alert(err?.response?.data?.message || 'Failed to save social links.');
+      const apiErrors = err?.response?.data?.errors;
+      const firstValidationError = apiErrors ? Object.values(apiErrors)?.[0]?.[0] : null;
+      setSocialError(firstValidationError || err?.response?.data?.message || 'Failed to save social links.');
     } finally {
       setIsSocialSubmitting(false);
     }
@@ -130,9 +158,10 @@ const SiteSettings = () => {
           <h3 className="text-[15px] font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>General Information</h3>
         </div>
         <form onSubmit={handleGeneralSubmit} className="p-6">
+          {generalError && <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-semibold">{generalError}</div>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Company Name</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Company Name <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 value={companyName}
@@ -142,7 +171,7 @@ const SiteSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Tagline</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Tagline <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 value={tagline}
@@ -152,7 +181,7 @@ const SiteSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Phone Number</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Phone Number <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 value={mobile}
@@ -162,7 +191,7 @@ const SiteSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Email Address</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Email Address <span className="text-red-500">*</span></label>
               <input 
                 type="email" 
                 value={email}
@@ -172,7 +201,7 @@ const SiteSettings = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Office Address</label>
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">Office Address <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 value={address}
@@ -186,6 +215,7 @@ const SiteSettings = () => {
           <div className="max-w-xs mb-6">
             <FormImageUpload 
               label="Website Logo" 
+              required
               initialPreview={logoPreview} 
               onImageSelect={(file) => setLogoFile(file)}
             />
@@ -207,6 +237,7 @@ const SiteSettings = () => {
           <h3 className="text-[15px] font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Social Media Links</h3>
         </div>
         <form onSubmit={handleSocialSubmit} className="p-6">
+          {socialError && <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-semibold">{socialError}</div>}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {[
               { icon: FaFacebookF, label: 'Facebook', placeholder: 'https://facebook.com/shivgroup', color: 'bg-blue-50 text-blue-600' },

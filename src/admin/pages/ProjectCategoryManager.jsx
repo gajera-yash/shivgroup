@@ -12,6 +12,7 @@ const ProjectCategoryManager = () => {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
   
   const [editId, setEditId] = useState(null);
   const [name, setName] = useState('');
@@ -53,7 +54,11 @@ const ProjectCategoryManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) return alert('Category Name is required.');
+    setFormError('');
+    if (!name.trim()) {
+      setFormError('Category Name is required.');
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -69,7 +74,9 @@ const ProjectCategoryManager = () => {
       fetchCategories();
       resetForm();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Failed to save category.');
+      const apiErrors = err?.response?.data?.errors;
+      const firstValidationError = apiErrors ? Object.values(apiErrors)?.[0]?.[0] : null;
+      setFormError(firstValidationError || err?.response?.data?.message || 'Failed to save category.');
     } finally {
       setIsSubmitting(false);
     }
@@ -79,6 +86,7 @@ const ProjectCategoryManager = () => {
     setEditId(null);
     setName('');
     setStatus('1');
+    setFormError('');
   };
 
   const closeModal = () => {
@@ -147,6 +155,11 @@ const ProjectCategoryManager = () => {
       {/* Add/Edit Category Modal */}
       <Modal isOpen={showAdd} onClose={closeModal} title={editId ? "Edit Category" : "Add New Category"} subtitle={editId ? "Update your project category details" : "Add a new project category to your portfolio"} size="md">
         <form onSubmit={handleSubmit} className="space-y-5">
+          {formError && (
+            <div className="px-3 py-2 rounded-lg bg-red-50 border border-red-100 text-red-600 text-xs font-semibold">
+              {formError}
+            </div>
+          )}
           <FormInput 
             label="Category Name" 
             required 

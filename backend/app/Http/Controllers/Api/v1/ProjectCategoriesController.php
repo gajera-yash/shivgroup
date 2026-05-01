@@ -32,8 +32,8 @@ class ProjectCategoriesController extends Controller
         $editId = $request->edit;
 
         $request->validate([
-            'edit' => 'nullable',
-            'category_name' => 'required|string|max:255',
+            'edit' => 'nullable|exists:project_categories,id',
+            'category_name' => 'required|string|max:255|unique:project_categories,category_name,' . $editId, 
             'status' => 'required|in:1,0',
         ]);
 

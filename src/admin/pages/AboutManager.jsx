@@ -120,6 +120,11 @@ const AboutManager = () => {
       return;
     }
 
+    if (!images[0] || !images[1] || !images[2]) {
+      setFormError('All three gallery images are required.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const fd = new FormData();
@@ -267,9 +272,9 @@ const AboutManager = () => {
           </div>
           <FormTextarea label="Description" required rows={4} placeholder="Describe this milestone year in detail..." value={description} onChange={(e) => setDescription(e.target.value)} />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormImageUpload label="Image 1 " onImageSelect={(file) => setAddImageAt(0, file)} />
-            <FormImageUpload label="Image 2 " onImageSelect={(file) => setAddImageAt(1, file)} />
-            <FormImageUpload label="Image 3 " onImageSelect={(file) => setAddImageAt(2, file)} />
+            <FormImageUpload label="Image 1" required onImageSelect={(file) => setAddImageAt(0, file)} />
+            <FormImageUpload label="Image 2" required onImageSelect={(file) => setAddImageAt(1, file)} />
+            <FormImageUpload label="Image 3" required onImageSelect={(file) => setAddImageAt(2, file)} />
           </div>
           <FormSelect label="Status" value={status} onChange={(e) => setStatus(e.target.value)} options={[{ value: 'active', label: 'Active' }, { value: 'draft', label: 'Draft' }]} />
           <FormActions onCancel={() => { setShowAddMilestone(false); resetAddForm(); }} submitText="Add Milestone" isLoading={isSubmitting} />

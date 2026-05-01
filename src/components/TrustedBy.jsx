@@ -1,18 +1,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
-
-const logos = [
-  { src: '/shivgroup/images/brand-logo01.png', alt: 'BUMN' },
-  { src: '/shivgroup/images/brand-logo02.png', alt: 'Caterpillar' },
-  { src: '/shivgroup/images/brand-logo03.png', alt: 'D+N' },
-  { src: '/shivgroup/images/brand-logo04.png', alt: 'American Muscle' },
-  { src: '/shivgroup/images/brand-logo05.png', alt: 'Volvo' },
-  { src: '/shivgroup/images/brand-logo06.png', alt: 'John Deere' },
-  { src: '/shivgroup/images/brand-logo07.png', alt: 'Perkins' },
-  { src: '/shivgroup/images/brand-logo08.png', alt: 'Marley' },
-];
+import { useRef, useState, useEffect } from 'react';
+import api from '../utils/api';
 
 const TrustedBy = () => {
+  const [partnersList, setPartnersList] = useState([]);
   const targetRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -20,6 +11,20 @@ const TrustedBy = () => {
   });
 
   const fillWidth = useTransform(scrollYProgress, [0.1, 0.4], ['0%', '100%']);
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        const res = await api.get('get-partners');
+        if (res?.data?.status) {
+          setPartnersList(res.data.data || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch partners:', err);
+      }
+    };
+    fetchPartners();
+  }, []);
 
   return (
     <section
@@ -45,39 +50,42 @@ const TrustedBy = () => {
           </motion.h2>
         </div>
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-[#aaa8a8] border-solid border-[1px]">
-          {logos.map((logo, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className={`h-[265px] flex items-center justify-center border-[#aaa8a8] border-solid group cursor-pointer overflow-hidden relative
-                ${(index + 1) % 4 !== 0 ? 'lg:border-r-[1px]' : ''}
-                ${(index + 1) % 2 !== 0 ? 'sm:border-r-[1px] lg:sm:border-r-0' : ''}
-                ${index < 4 ? 'border-b-[1px]' : ''}
-                ${index >= 4 ? 'sm:border-t-0' : ''}
-              `}
-              style={{
-                borderRight: (index + 1) % 4 === 0 ? '0' : '1px solid #aaa8a8',
-                borderBottom: index < 4 ? '1px solid #aaa8a8' : '0',
-              }}
-            >
-              <div className="relative w-full h-[40px] flex flex-col items-center justify-center overflow-hidden">
-                <img
-                  src={logo.src}
-                  alt={`${logo.alt} grayscale`}
-                  className="w-auto h-full max-w-[80%] object-contain grayscale transition-all duration-500 ease-in-out transform group-hover:-translate-y-[150%]"
-                />
+          {partnersList.length > 0 ? (
+            partnersList.map((partner, index) => (
+              <motion.div
+                key={partner.id || index}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                className={`h-[265px] flex items-center justify-center border-[#aaa8a8] border-solid group cursor-pointer overflow-hidden relative
+                  ${(index + 1) % 4 !== 0 ? 'lg:border-r-[1px]' : ''}
+                  ${(index + 1) % 2 !== 0 ? 'sm:border-r-[1px] lg:sm:border-r-0' : ''}
+                  ${index < Math.floor((partnersList.length - 1) / 4) * 4 ? 'border-b-[1px]' : ''}
+                `}
+                style={{
+                  borderRight: (index + 1) % 4 === 0 ? '0' : '1px solid #aaa8a8',
+                  borderBottom: index < Math.ceil(partnersList.length / 4 - 1) * 4 ? '1px solid #aaa8a8' : '0',
+                }}
+              >
+                <div className="relative w-full h-[40px] flex flex-col items-center justify-center overflow-hidden">
+                  <img
+                    src={partner.partner_image}
+                    alt={`${partner.partner_name} grayscale`}
+                    className="w-auto h-full max-w-[80%] object-contain grayscale transition-all duration-500 ease-in-out transform group-hover:-translate-y-[150%]"
+                  />
 
-                <img
-                  src={logo.src}
-                  alt={`${logo.alt} color`}
-                  className="absolute w-auto h-full max-w-[80%] object-contain translate-y-[150%] transition-all duration-500 ease-in-out group-hover:translate-y-0"
-                />
-              </div>
-            </motion.div>
-          ))}
+                  <img
+                    src={partner.partner_image}
+                    alt={`${partner.partner_name} color`}
+                    className="absolute w-auto h-full max-w-[80%] object-contain translate-y-[150%] transition-all duration-500 ease-in-out group-hover:translate-y-0"
+                  />
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full py-10 text-center text-slate-400 font-body">No partners found.</div>
+          )}
         </div>
       </div>
     </section>

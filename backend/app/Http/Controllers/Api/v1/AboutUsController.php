@@ -40,8 +40,9 @@ class AboutUsController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'status' => 'required|in:1,0',
-            'about_image' => 'nullable|array',
-            'about_image.*' => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'about_image_0' => $request->edit ? 'nullable|image|mimes:jpg,jpeg,png,webp' : 'required|image|mimes:jpg,jpeg,png,webp',
+            'about_image_1' => $request->edit ? 'nullable|image|mimes:jpg,jpeg,png,webp' : 'required|image|mimes:jpg,jpeg,png,webp',
+            'about_image_2' => $request->edit ? 'nullable|image|mimes:jpg,jpeg,png,webp' : 'required|image|mimes:jpg,jpeg,png,webp',
         ]);
 
         DB::beginTransaction();

@@ -1,13 +1,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-
-const awards = [
-  // Added images to each award to show during the custom cursor hover effect
-  { title: 'Design Architectural Award', year: '2025', image: '/shivgroup/images/brand-logo01.png' },
-  { title: 'Design Distinction Award', year: '2023', image: '/shivgroup/images/brand-logo02.png' },
-];
+import api from '../utils/api';
 
 const Awards = () => {
+  const [awardsList, setAwardsList] = useState([]);
   const [hoveredAwardIndex, setHoveredAwardIndex] = useState(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -21,6 +17,18 @@ const Awards = () => {
   const fillWidth = useTransform(scrollYProgress, [0.1, 0.4], ["0%", "100%"]);
 
   useEffect(() => {
+    const fetchAwards = async () => {
+      try {
+        const res = await api.get('get-awards');
+        if (res?.data?.status) {
+          setAwardsList(res.data.data || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch awards:', err);
+      }
+    };
+    fetchAwards();
+
     // Window mousemove track is safest for smooth fixed cursor following
     const updateMousePosition = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -56,11 +64,11 @@ const Awards = () => {
           mass: 0.5,
         }}
       >
-        {awards.map((award, index) => (
+        {awardsList.map((award, index) => (
           <img
             key={index}
-            src={award.image}
-            alt={award.title}
+            src={award.award_image}
+            alt={award.award_title}
             className={`absolute w-full h-full object-contain p-2 transition-opacity duration-300 ${
               hoveredAwardIndex === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
             }`}
@@ -129,7 +137,8 @@ const Awards = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="lg:col-span-8 bg-white rounded-xl p-6 md:p-10 flex flex-col justify-center relative"
           >
-            {awards.map((award, index) => (
+            {awardsList.length > 0 ? (
+              awardsList.map((award, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
@@ -137,19 +146,22 @@ const Awards = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.4 + (index * 0.1) }}
                   className={`flex justify-between items-center py-6 md:py-10 ${
-                    index !== awards.length - 1 ? 'border-b border-[#F0F0F0]' : ''
+                    index !== awardsList.length - 1 ? 'border-b border-[#F0F0F0]' : ''
                   } group cursor-pointer`} 
                   onMouseEnter={() => setHoveredAwardIndex(index)}
                   onMouseLeave={() => setHoveredAwardIndex(null)}
                 >
                   <div className="font-body font-bold text-[#111111] text-xl sm:text-2xl md:text-3xl lg:text-4xl group-hover:text-primary transition-colors m-0 duration-300">
-                    {award.title}
+                    {award.award_title}
                   </div>
                   <div className="font-heading text-[#0A0A0A] font-bold text-2xl sm:text-4xl lg:text-[50px] leading-none group-hover:text-primary transition-colors m-0 duration-300">
                     {award.year}
                   </div>
                 </motion.div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-10 text-slate-400 font-body">No awards found.</div>
+            )}
           </motion.div>
 
         </div>

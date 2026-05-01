@@ -63,6 +63,8 @@ const AddProject = () => {
 
         if (data.points?.length > 0) {
           setProjectPoints(data.points.map(p => ({ id: p.id, point: p.point })));
+        } else {
+          setProjectPoints([{ id: null, point: '' }]);
         }
         
         if (data.sections?.length > 0) {
@@ -73,6 +75,8 @@ const AddProject = () => {
             imageFile: null,
             existingImage: s.section_image
           })));
+        } else {
+          setProjectSections([{ id: null, title: '', description: '', imageFile: null, existingImage: null }]);
         }
       }
     } catch (err) {
@@ -121,8 +125,33 @@ const AddProject = () => {
     e.preventDefault();
     setError('');
 
+    // Frontend Validations
     if (!title.trim() || !categoryId) {
       setError('Project Title and Category are required.');
+      return;
+    }
+    if (!isEditMode && !imageFile) {
+      setError('Project main image is required.');
+      return;
+    }
+    if (tags.length === 0) {
+      setError('At least one project tag is required.');
+      return;
+    }
+    if (!description.trim()) {
+      setError('Project description is required.');
+      return;
+    }
+    if (!mapLink.trim()) {
+      setError('Google Maps link is required.');
+      return;
+    }
+    if (projectPoints.some(p => !p.point.trim())) {
+      setError('All project points must be filled.');
+      return;
+    }
+    if (projectSections.some(s => !s.title.trim() || !s.description.trim() || (!s.imageFile && !s.existingImage))) {
+      setError('All project sections (title, description, and image) are required.');
       return;
     }
 
@@ -135,35 +164,24 @@ const AddProject = () => {
       fd.append('status', status);
       fd.append('description', description.trim());
       fd.append('map_link', mapLink.trim());
-      
-      if (tags.length > 0) {
-        fd.append('tags', JSON.stringify(tags));
-      }
+      fd.append('tags', JSON.stringify(tags));
 
       if (imageFile) {
         fd.append('project_image', imageFile);
       }
 
       // Project Points
-      let pointIdx = 0;
-      projectPoints.forEach((p) => {
-        if (p.point.trim()) {
-          if (p.id) fd.append(`project_points[${pointIdx}][id]`, p.id);
-          fd.append(`project_points[${pointIdx}][point]`, p.point.trim());
-          pointIdx++;
-        }
+      projectPoints.forEach((p, idx) => {
+        if (p.id) fd.append(`project_points[${idx}][id]`, p.id);
+        fd.append(`project_points[${idx}][point]`, p.point.trim());
       });
 
       // Project Sections
-      let secIdx = 0;
-      projectSections.forEach((s) => {
-        if (s.title.trim() && s.description.trim()) {
-          if (s.id) fd.append(`project_sections[${secIdx}][id]`, s.id);
-          fd.append(`project_sections[${secIdx}][section_title]`, s.title.trim());
-          fd.append(`project_sections[${secIdx}][section_content]`, s.description.trim());
-          if (s.imageFile) fd.append(`project_sections[${secIdx}][section_image]`, s.imageFile);
-          secIdx++;
-        }
+      projectSections.forEach((s, idx) => {
+        if (s.id) fd.append(`project_sections[${idx}][id]`, s.id);
+        fd.append(`project_sections[${idx}][section_title]`, s.title.trim());
+        fd.append(`project_sections[${idx}][section_content]`, s.description.trim());
+        if (s.imageFile) fd.append(`project_sections[${idx}][section_image]`, s.imageFile);
       });
 
       const res = await api.post('add-projects', fd, {
@@ -209,7 +227,7 @@ const AddProject = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 pb-20">
         {error && <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-semibold">{error}</div>}
 
         {/* Main Details Card */}
@@ -249,7 +267,7 @@ const AddProject = () => {
                   />
                 </div>
                 <FormTagInput 
-                  label="Project Tags" 
+                  label="Project Tags (at least one) *" 
                   tags={tags} 
                   onAddTag={handleAddTag} 
                   onRemoveTag={handleRemoveTag}
@@ -258,7 +276,8 @@ const AddProject = () => {
               </div>
               <div className="lg:col-span-1 h-full flex flex-col justify-start">
                 <FormImageUpload 
-                  label="Project Main Image" 
+                  label={`Project Main Image ${isEditMode ? '(optional)' : '*'}`}
+                  required={!isEditMode}
                   initialPreview={imagePreview}
                   onImageSelect={(file) => setImageFile(file)}
                 />
@@ -272,6 +291,7 @@ const AddProject = () => {
             <div className="space-y-5">
               <FormTextarea 
                 label="Description" 
+                required
                 rows={4} 
                 placeholder="Describe the project details, scope, and achievements..." 
                 value={description}
@@ -279,6 +299,7 @@ const AddProject = () => {
               />
               <FormInput 
                 label="Google Maps Embed URL" 
+                required
                 placeholder="https://maps.google.com/..." 
                 value={mapLink}
                 onChange={(e) => setMapLink(e.target.value)}
@@ -290,7 +311,7 @@ const AddProject = () => {
           <div>
             <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Project Points</h3>
+                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Project Points *</h3>
                 <p className="text-xs text-slate-500 mt-0.5">Add key features or bullet points for the project.</p>
               </div>
               <button type="button" onClick={handleAddPoint} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 text-xs font-bold rounded-lg transition-colors">
@@ -303,6 +324,7 @@ const AddProject = () => {
                   <div className="flex-1">
                     <input
                       type="text"
+                      required
                       value={p.point}
                       onChange={(e) => handlePointChange(index, e.target.value)}
                       placeholder={`Detail point ${index + 1}`}
@@ -324,7 +346,7 @@ const AddProject = () => {
         {/* Project Sections Header */}
         <div className="flex items-center justify-between px-2 pt-2">
           <div>
-            <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Project Sections</h3>
+            <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Project Sections *</h3>
             <p className="text-sm text-slate-500 mt-1">Manage detailed sections to build your project page.</p>
           </div>
           <button type="button" onClick={handleAddSection} className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white hover:bg-slate-700 text-xs font-bold rounded-xl transition-all shadow-md shadow-slate-200">
@@ -345,9 +367,10 @@ const AddProject = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Section Title</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Section Title *</label>
                     <input
                       type="text"
+                      required
                       value={section.title}
                       onChange={(e) => handleSectionChange(index, 'title', e.target.value)}
                       placeholder="e.g. A MID-SCALE COMMERCIAL BUILDING..."
@@ -355,9 +378,10 @@ const AddProject = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Section Description</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Section Description *</label>
                     <textarea
                       value={section.description}
+                      required
                       onChange={(e) => handleSectionChange(index, 'description', e.target.value)}
                       rows={5}
                       placeholder="Describe this section..."
@@ -367,7 +391,8 @@ const AddProject = () => {
                 </div>
                 <div className="h-full flex flex-col justify-start">
                   <FormImageUpload 
-                    label="Section Image" 
+                    label="Section Image *" 
+                    required
                     initialPreview={section.existingImage}
                     onImageSelect={(file) => handleSectionChange(index, 'imageFile', file)} 
                   />

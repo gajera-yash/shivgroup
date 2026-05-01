@@ -151,4 +151,22 @@ class TestimonialsController extends Controller
             ], 500);
         }
     }
+
+    public function testimonials()
+    {
+        try {
+            $testimonial = Testimonial::where("status", 1)->orderBy("id", "desc")->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Testimonials retrieved successfully.',
+                'data' => $testimonial,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

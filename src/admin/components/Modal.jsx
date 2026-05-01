@@ -107,7 +107,7 @@ export const FormSelect = ({ label, required, options = [], ...props }) => (
 
 import { useState, useRef } from 'react';
 
-export const FormImageUpload = ({ label, initialPreview = null, onImageSelect }) => {
+export const FormImageUpload = ({ label, required, initialPreview = null, onImageSelect }) => {
   const [preview, setPreview] = useState(initialPreview);
   const fileInputRef = useRef(null);
 
@@ -126,7 +126,7 @@ export const FormImageUpload = ({ label, initialPreview = null, onImageSelect })
   return (
     <div>
       <label className="block text-xs font-bold text-slate-600 mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div 
         className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-[#AB2F2F]/30 hover:bg-red-50/30 transition-all cursor-pointer relative overflow-hidden group"

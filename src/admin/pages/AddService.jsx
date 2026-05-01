@@ -133,8 +133,35 @@ const AddService = () => {
     e.preventDefault();
     setError('');
 
+    // Frontend Validations
     if (!title.trim() || !shortDesc.trim() || !fullDesc.trim()) {
       setError('Title and Descriptions are required.');
+      return;
+    }
+
+    if (!isEditMode && !image) {
+      setError('Service main image is required.');
+      return;
+    }
+
+    // Check dynamic lists
+    if (includedItems.some(item => !item.text.trim())) {
+      setError('All "What\'s Included" items must be filled.');
+      return;
+    }
+
+    if (rulesItems.some(item => !item.text.trim())) {
+      setError('All "Rules We Build By" must be filled.');
+      return;
+    }
+
+    if (brochures.some(bro => !bro.file && !bro.existingUrl)) {
+      setError('All Brochure files are required.');
+      return;
+    }
+
+    if (workingProcess.some(proc => !proc.title.trim() || !proc.description.trim() || (!proc.file && !proc.existingUrl))) {
+      setError('All Working Process steps (title, description, and image) are required.');
       return;
     }
 
@@ -149,45 +176,29 @@ const AddService = () => {
       if (image) fd.append('service_image', image);
 
       // Subservices
-      let includedIdx = 0;
-      includedItems.forEach((sub) => {
-        if (sub.text.trim()) {
-          if (sub.id) fd.append(`subservice[${includedIdx}][id]`, sub.id);
-          fd.append(`subservice[${includedIdx}][description]`, sub.text.trim());
-          includedIdx++;
-        }
+      includedItems.forEach((sub, idx) => {
+        if (sub.id) fd.append(`subservice[${idx}][id]`, sub.id);
+        fd.append(`subservice[${idx}][description]`, sub.text.trim());
       });
 
       // Rules
-      let ruleIdx = 0;
-      rulesItems.forEach((rule) => {
-        if (rule.text.trim()) {
-          if (rule.id) fd.append(`service_rules[${ruleIdx}][id]`, rule.id);
-          fd.append(`service_rules[${ruleIdx}][rule]`, rule.text.trim());
-          ruleIdx++;
-        }
+      rulesItems.forEach((rule, idx) => {
+        if (rule.id) fd.append(`service_rules[${idx}][id]`, rule.id);
+        fd.append(`service_rules[${idx}][rule]`, rule.text.trim());
       });
 
       // Brochures
-      let broIdx = 0;
-      brochures.forEach((bro) => {
-        if (bro.file || bro.id) {
-          if (bro.id) fd.append(`brochures[${broIdx}][id]`, bro.id);
-          if (bro.file) fd.append(`brochures[${broIdx}][brochure_file]`, bro.file);
-          broIdx++;
-        }
+      brochures.forEach((bro, idx) => {
+        if (bro.id) fd.append(`brochures[${idx}][id]`, bro.id);
+        if (bro.file) fd.append(`brochures[${idx}][brochure_file]`, bro.file);
       });
 
       // Working Process
-      let procIdx = 0;
-      workingProcess.forEach((proc) => {
-        if (proc.title.trim()) {
-          if (proc.id) fd.append(`service_contents[${procIdx}][id]`, proc.id);
-          fd.append(`service_contents[${procIdx}][title]`, proc.title.trim());
-          fd.append(`service_contents[${procIdx}][description]`, proc.description.trim());
-          if (proc.file) fd.append(`service_contents[${procIdx}][content_image]`, proc.file);
-          procIdx++;
-        }
+      workingProcess.forEach((proc, idx) => {
+        if (proc.id) fd.append(`service_contents[${idx}][id]`, proc.id);
+        fd.append(`service_contents[${idx}][title]`, proc.title.trim());
+        fd.append(`service_contents[${idx}][description]`, proc.description.trim());
+        if (proc.file) fd.append(`service_contents[${idx}][content_image]`, proc.file);
       });
 
       const res = await api.post('add-services', fd, {
@@ -197,7 +208,9 @@ const AddService = () => {
       alert(res?.data?.message || `Service ${isEditMode ? 'updated' : 'added'} successfully.`);
       navigate('/admin/services');
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to save service.');
+      const apiErrors = err?.response?.data?.errors;
+      const firstValidationError = apiErrors ? Object.values(apiErrors)?.[0]?.[0] : null;
+      setError(firstValidationError || err?.response?.data?.message || 'Failed to save service.');
     } finally {
       setIsSubmitting(false);
     }
@@ -228,7 +241,7 @@ const AddService = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 pb-20">
         {error && <div className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-semibold">{error}</div>}
 
         {/* Main Details Card */}
@@ -255,10 +268,10 @@ const AddService = () => {
               <div className="lg:col-span-2 space-y-5">
                 <FormInput label="Service Title" required placeholder="e.g. CONSTRUCTION SOLUTIONS" value={title} onChange={(e) => setTitle(e.target.value)} />
                 <FormTextarea label="Short Description" rows={2} required placeholder="Brief description to display on service cards..." value={shortDesc} onChange={(e) => setShortDesc(e.target.value)} />
-                <FormTextarea label="Full Description" rows={5} placeholder="Detailed description for the main service page..." value={fullDesc} onChange={(e) => setFullDesc(e.target.value)} />
+                <FormTextarea label="Full Description" required rows={5} placeholder="Detailed description for the main service page..." value={fullDesc} onChange={(e) => setFullDesc(e.target.value)} />
               </div>
               <div className="lg:col-span-1 h-full flex flex-col justify-start">
-                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Service Main Image</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Service Main Image *</label>
                 <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-4 flex flex-col items-center justify-center text-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer min-h-[200px] overflow-hidden group">
                   {imagePreview ? (
                      <>
@@ -266,8 +279,8 @@ const AddService = () => {
                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                          <span className="text-white text-xs font-bold bg-black/50 px-3 py-1.5 rounded-full">Change Image</span>
                        </div>
-                     </
-                  > ) : (
+                     </>
+                  ) : (
                     <>
                       <div className="w-10 h-10 rounded-full bg-[#AB2F2F]/10 flex items-center justify-center mb-3 text-[#AB2F2F]">
                         <HiOutlinePlus className="w-5 h-5" />
@@ -287,7 +300,7 @@ const AddService = () => {
             {/* What's Included */}
             <div>
               <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>What's Included</h3>
+                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>What's Included *</h3>
                 <button type="button" onClick={handleAddIncluded} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 text-xs font-bold rounded-lg transition-colors">
                   <HiOutlinePlus className="w-3.5 h-3.5" /> Add
                 </button>
@@ -297,6 +310,7 @@ const AddService = () => {
                   <div key={index} className="flex items-start gap-3">
                     <input
                       type="text"
+                      required
                       value={item.text}
                       onChange={(e) => handleIncludedChange(index, e.target.value)}
                       placeholder={`Included item ${index + 1}`}
@@ -315,7 +329,7 @@ const AddService = () => {
             {/* Rules We Build By */}
             <div>
               <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Rules We Build By</h3>
+                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Rules We Build By *</h3>
                 <button type="button" onClick={handleAddRule} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 text-xs font-bold rounded-lg transition-colors">
                   <HiOutlinePlus className="w-3.5 h-3.5" /> Add
                 </button>
@@ -325,6 +339,7 @@ const AddService = () => {
                   <div key={index} className="flex items-start gap-3">
                     <input
                       type="text"
+                      required
                       value={item.text}
                       onChange={(e) => handleRuleChange(index, e.target.value)}
                       placeholder={`Rule ${index + 1}`}
@@ -345,7 +360,7 @@ const AddService = () => {
           <div className="pt-6 border-t border-slate-100">
             <div className="flex items-center justify-between mb-5 pb-3">
               <div>
-                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Brochures / Documents</h3>
+                <h3 className="text-base font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Brochures / Documents *</h3>
                 <p className="text-xs text-slate-500 mt-0.5">Upload PDF or DOC files for clients to download.</p>
               </div>
               <button type="button" onClick={handleAddBrochure} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800 text-xs font-bold rounded-lg transition-colors">
@@ -362,7 +377,7 @@ const AddService = () => {
                   )}
                   <div className="space-y-4 pr-6">
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Upload File</label>
+                      <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Upload File *</label>
                       <input
                         type="file"
                         accept=".pdf,.doc,.docx"
@@ -386,7 +401,7 @@ const AddService = () => {
         {/* Working Process Header */}
         <div className="flex items-center justify-between px-2 pt-2">
           <div>
-            <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Working Process Steps</h3>
+            <h3 className="text-lg font-bold text-slate-800" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Working Process Steps *</h3>
             <p className="text-sm text-slate-500 mt-1">Manage process steps like Consultation, Planning, Delivery.</p>
           </div>
           <button type="button" onClick={handleAddProcess} className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white hover:bg-slate-700 text-xs font-bold rounded-xl transition-all shadow-md shadow-slate-200">
@@ -407,9 +422,10 @@ const AddService = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-5">
                   <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Step Title</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Step Title *</label>
                     <input
                       type="text"
+                      required
                       value={step.title}
                       onChange={(e) => handleProcessChange(index, 'title', e.target.value)}
                       placeholder="e.g. CONSULTATION"
@@ -417,9 +433,10 @@ const AddService = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Step Description</label>
+                    <label className="block text-xs font-bold text-slate-600 mb-1.5">Step Description *</label>
                     <textarea
                       value={step.description}
+                      required
                       onChange={(e) => handleProcessChange(index, 'description', e.target.value)}
                       rows={5}
                       placeholder="Describe this process step..."
@@ -428,7 +445,7 @@ const AddService = () => {
                   </div>
                 </div>
                 <div className="h-full flex flex-col justify-start">
-                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Step Image</label>
+                  <label className="block text-xs font-bold text-slate-600 mb-1.5">Step Image *</label>
                   <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-8 flex flex-col items-center justify-center text-center bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer min-h-[200px] overflow-hidden group">
                     {step.existingUrl ? (
                       <>

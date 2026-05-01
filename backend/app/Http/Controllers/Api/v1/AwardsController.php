@@ -50,7 +50,7 @@ class AwardsController extends Controller
             'award_title' => 'required|string|max:255',
             'organization' => 'required|string|max:255',
             'year' => 'required|string|max:10',
-            'award_image' => 'nullable|image|mimes:jpg,jpeg,png,webp',
+            'award_image' => $editId ? 'nullable|image|mimes:jpg,jpeg,png,webp' : 'required|image|mimes:jpg,jpeg,png,webp',
             'status' => 'required|in:1,0',
         ]);
 
@@ -149,6 +149,25 @@ class AwardsController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getAwards()
+    {
+        try {
+            $awards = Award::where('status', 1)->orderBy('year', 'desc')->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Awards retrieved successfully.',
+                'data' => $awards,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch awards',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

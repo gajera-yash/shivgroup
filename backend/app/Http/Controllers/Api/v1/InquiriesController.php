@@ -28,7 +28,7 @@ class InquiriesController extends Controller
             "mobile" => "required|numeric|digits:10",
             "email" => "required|email|max:255",
             "subject" => "required|string|max:255",
-            "message" => "required|string",
+            "message" => "required|string|min:10",
             "attachment" => "nullable|file|mimes:jpg,jpeg,png,webp,pdf,doc,docx|max:10240"
         ]);
 

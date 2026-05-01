@@ -20,6 +20,11 @@ Route::prefix('v1')->group(function () {
 
     // Public Inquiries
     Route::post('add-inquiries', [InquiriesController::class, 'store']);
+    Route::get('latest-banner', [HomeBannersController::class, 'latestBanner']);
+    Route::get('get-awards', [AwardsController::class, 'getAwards']);
+    Route::get('get-partners', [PartnersController::class, 'getPartners']);
+    Route::get('get-testimonials', [TestimonialsController::class, 'testimonials']);
+    Route::get('get-latest-service', [ServicesController::class,'latestService']);
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('logout', [UsersController::class, 'logout']);

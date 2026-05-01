@@ -32,12 +32,20 @@ class GeneralInformationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_name' => 'nullable|string|max:255',
-            'tagline' => 'nullable|string',
-            'mobile' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'company_logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'company_name' => 'required|string|max:255',
+            'tagline' => 'required|string',
+            'mobile' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
+            'address' => 'required|string',
+            'company_logo' => GeneralInformation::first() ? 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120' : 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ], [
+            'company_name.required' => 'Company Name is required.',
+            'tagline.required' => 'Tagline is required.',
+            'mobile.required' => 'Phone Number is required.',
+            'email.required' => 'Email Address is required.',
+            'email.email' => 'Please enter a valid email address.',
+            'address.required' => 'Office Address is required.',
+            'company_logo.required' => 'Website Logo is required.',
         ]);
 
         DB::beginTransaction();

@@ -1,6 +1,24 @@
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import api from '../utils/api';
 
 const Hero = () => {
+  const [banner, setBanner] = useState(null);
+
+  useEffect(() => {
+    const fetchLatestBanner = async () => {
+      try {
+        const res = await api.get('latest-banner');
+        if (res?.data?.status && res?.data?.data) {
+          setBanner(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch latest banner:', err);
+      }
+    };
+    fetchLatestBanner();
+  }, []);
+
   // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -39,14 +57,15 @@ const Hero = () => {
     >
       {/* Background Image with Ken Burns Effect */}
       <motion.div
+        key={banner?.id || 'default'}
         initial={{ scale: 1.2, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 2.5, ease: "easeOut" }}
         className="absolute inset-0 z-0"
       >
         <img
-          src="/shivgroup/images/hero section.webp"
-          alt="Construction site excavator"
+          src={banner?.banner_image || "/shivgroup/images/hero section.webp"}
+          alt={banner?.title || "Construction site excavator"}
           className="h-full w-full object-cover object-center"
         />
       </motion.div>
@@ -98,20 +117,21 @@ const Hero = () => {
       >
         {/* Top Floating Text */}
         <motion.p
+          key={banner?.id ? `desc-${banner.id}` : 'default-desc'}
           variants={itemVariants}
-          className="absolute left-8 lg:left-[135px] top-[10%] max-w-[280px] font-body text-[14px] md:text-[16px] font-bold uppercase leading-relaxed tracking-[0.1em] text-white"
+          className="absolute left-8 lg:left-[135px] top-[10%] max-w-[280px] font-body text-[14px] md:text-[16px] font-bold uppercase leading-relaxed tracking-[0.1em] text-white whitespace-pre-line"
         >
-          FROM CONCEPT TO COMPLETION <br /> WE BUILD IT RIGHT
+          {banner?.description || "FROM CONCEPT TO COMPLETION \n WE BUILD IT RIGHT"}
         </motion.p>
 
         {/* Main Header Reveal */}
         <div className="absolute bottom-[260px] sm:bottom-[9%] left-4 sm:left-8 lg:left-[135px]">
           <motion.h1
+            key={banner?.id ? `title-${banner.id}` : 'default-title'}
             variants={itemVariants}
-            className="font-heading text-[42px] sm:text-[60px] md:text-[90px] lg:text-[120px] xl:text-[140px] font-bold uppercase tracking-tight text-white leading-[1]"
+            className="font-heading text-[42px] sm:text-[60px] md:text-[90px] lg:text-[120px] xl:text-[140px] font-bold uppercase tracking-tight text-white leading-[1] whitespace-pre-line"
           >
-            We Build <br />
-            <span className="">The Future</span>
+            {banner?.title || "We Build \n The Future"}
           </motion.h1>
         </div>
 

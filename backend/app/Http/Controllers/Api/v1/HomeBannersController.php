@@ -57,7 +57,7 @@ class HomeBannersController extends Controller
         $request->validate([
             'edit' => 'nullable|string',
             'title' => 'required|string|unique:home_banners,title,' . $editId . ',id',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'banner_image' => $editId ? 'nullable|image|mimes:jpg,jpeg,png,webp' : 'required|image|mimes:jpg,jpeg,png,webp',
             'status' => 'required|in:1,0',
         ]);
@@ -164,6 +164,32 @@ class HomeBannersController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function latestBanner()
+    {
+        try {
+            $banner = HomeBanner::orderBy('id', 'desc')->where('status', 1)->first();
+            if (!$banner) {
+                return response()->json([
+                    "status" => true,
+                    "message" => "No banners found.",
+                    "data" => null
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Latest banner retrieved successfully.',
+                'data' => $banner,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch banner',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

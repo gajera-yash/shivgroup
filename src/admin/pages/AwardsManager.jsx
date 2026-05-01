@@ -131,8 +131,8 @@ const AwardsManager = () => {
     e.preventDefault();
     setAwardFormError('');
 
-    if (!awardTitle.trim() || !awardOrganization.trim() || !awardYear.toString().trim()) {
-      setAwardFormError('Award Title, Organization and Year are required.');
+    if (!awardTitle.trim() || !awardOrganization.trim() || !awardYear.toString().trim() || !awardImage) {
+      setAwardFormError('Award Title, Organization, Year and Image are required.');
       return;
     }
 
@@ -183,8 +183,8 @@ const AwardsManager = () => {
     e.preventDefault();
     setEditAwardError('');
 
-    if (!editAwardTitle.trim() || !editAwardOrganization.trim() || !editAwardYear.toString().trim()) {
-      setEditAwardError('Award Title, Organization and Year are required.');
+    if (!editAwardTitle.trim() || !editAwardOrganization.trim() || !editAwardYear.toString().trim() || (!editAwardImage && !editAwardImagePreview)) {
+      setEditAwardError('Award Title, Organization, Year and Image are required.');
       return;
     }
 
@@ -416,7 +416,7 @@ const AwardsManager = () => {
             <FormInput label="Organization" required placeholder="e.g. National Builder Awards" value={awardOrganization} onChange={(e) => setAwardOrganization(e.target.value)} />
             <FormInput label="Year" required placeholder="e.g. 2024" type="number" value={awardYear} onChange={(e) => setAwardYear(e.target.value)} />
           </div>
-          <FormImageUpload label="Award Certificate / Image" onImageSelect={setAwardImage} />
+          <FormImageUpload label="Award Certificate / Image" required onImageSelect={setAwardImage} />
           <FormSelect
             label="Status"
             value={awardStatus}
@@ -436,7 +436,7 @@ const AwardsManager = () => {
             <FormInput label="Organization" required value={editAwardOrganization} onChange={(e) => setEditAwardOrganization(e.target.value)} />
             <FormInput label="Year" required type="number" value={editAwardYear} onChange={(e) => setEditAwardYear(e.target.value)} />
           </div>
-          <FormImageUpload label="Award Certificate / Image " initialPreview={editAwardImagePreview} onImageSelect={setEditAwardImage} />
+          <FormImageUpload label="Award Certificate / Image" required initialPreview={editAwardImagePreview} onImageSelect={setEditAwardImage} />
           <FormSelect
             label="Status"
             value={editAwardStatus}

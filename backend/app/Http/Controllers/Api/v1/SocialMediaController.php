@@ -32,7 +32,9 @@ class SocialMediaController extends Controller
         $request->validate([
             'socials' => 'required|array',
             'socials.*.platform' => 'required|string',
-            'socials.*.url' => 'nullable|string',
+            'socials.*.url' => 'nullable|url',
+        ], [
+            'socials.*.url.url' => 'Please enter a valid URL for :attribute.',
         ]);
 
         DB::beginTransaction();
