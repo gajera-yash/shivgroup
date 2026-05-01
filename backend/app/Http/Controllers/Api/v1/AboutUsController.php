@@ -205,4 +205,22 @@ class AboutUsController extends Controller
             ], 500);
         }
     }
+
+    public function getAboutUsData()
+    {
+        try {
+            $about_us = AboutUs::with('aboutUsImages')->where('status', 1)->get();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Data fetched successfully.",
+                "data" => $about_us,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Internal Server Error",
+            ], 500);
+        }
+    }
 }

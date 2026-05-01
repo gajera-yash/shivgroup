@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::get('get-about-us-data-by-id/{id}', [AboutUsController::class, 'getAboutUsDataById']);
     Route::get('get-site-info', [GeneralInformationController::class, 'getGeneralInfo']);
     Route::get('get-social-links', [SocialMediaController::class, 'getSocialMediaLinks']);
+    Route::get('get-about-us', [AboutUsController::class, 'getAboutUsData']);
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('logout', [UsersController::class, 'logout']);

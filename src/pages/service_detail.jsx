@@ -69,7 +69,7 @@ const ServiceDetail = () => {
       <section
         className="relative pb-20  md:pb-28"
         style={{
-          backgroundImage: "url('/images/page_title_bg.jpg')",
+          backgroundImage: "url('/shivgroup/images/page_title_bg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

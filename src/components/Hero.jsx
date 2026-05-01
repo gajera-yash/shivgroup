@@ -157,7 +157,7 @@ const Hero = () => {
           </div>
 
           <a
-            href="/contact"
+            href="shivgroup/contact"
             className="flex h-[50px] md:h-[60px] mb-4 items-center border border-white/80 hover:bg-white text-white hover:text-primary transition-all duration-300 px-6 md:px-8 group/btn"
           >
             <span className="flex-1 text-[11px] md:text-[13px] font-bold uppercase tracking-widest">Get In Touch</span>
