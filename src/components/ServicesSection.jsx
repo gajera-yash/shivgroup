@@ -19,18 +19,17 @@ const ServicesSection = () => {
   const fillWidth = useTransform(scrollYProgress, [0.1, 0.4], ["0%", "100%"]);
 
   useEffect(() => {
-    const fetchLatestService = async () => {
+    const fetchServices = async () => {
       try {
-        const res = await api.get('get-latest-service');
+        const res = await api.get('get-letest-services');
         if (res?.data?.status && res?.data?.data) {
-          // Putting it in an array to maintain the list structure of the component
-          setServicesList([res.data.data]);
+          setServicesList(res.data.data);
         }
       } catch (err) {
         console.error('Failed to fetch services:', err);
       }
     };
-    fetchLatestService();
+    fetchServices();
   }, []);
 
   return (
@@ -67,7 +66,7 @@ const ServicesSection = () => {
               <div className="lg:border-r border-white/20">
                 {servicesList.map((service, index) => (
                   <button
-                    key={service.id || index}
+                    key={service.hash || index}
                     type="button"
                     onClick={() => setActiveIndex(index)}
                     className={`w-full text-left group flex items-center justify-between gap-4 px-6 md:px-10 py-6 md:py-8 lg:py-10 border-b border-white/20 last:border-b-0 transition-all duration-300 cursor-pointer ${
@@ -115,7 +114,7 @@ const ServicesSection = () => {
 
                     <div className="mt-10">
                       <Link
-                        to={`/services`}
+                        to={`/services/${activeService.hash}`}
                         className="inline-flex items-center gap-3 font-heading font-bold text-white uppercase text-base group"
                       >
                         READ MORE

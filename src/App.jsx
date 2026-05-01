@@ -82,7 +82,7 @@ function App() {
           <Route path="services" element={<ServicesPage />} />
           <Route path="services/:id" element={<ServiceDetail />} />
           <Route path="projects" element={<Projects />} />
-          <Route path="project-details" element={<ProjectDetails />} />
+          <Route path="project-details/:hash" element={<ProjectDetails />} />
           <Route path="contact" element={<Contact />} />
         </Route>
 

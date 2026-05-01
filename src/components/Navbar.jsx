@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { HiOutlineMenuAlt3, HiX } from 'react-icons/hi';
 import { FiPhone } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../utils/api';
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -16,7 +17,22 @@ const navLinks = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [siteInfo, setSiteInfo] = useState(null);
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchSiteInfo = async () => {
+      try {
+        const res = await api.get('get-site-info').catch(() => ({ data: null }));
+        if (res?.data) {
+          setSiteInfo(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch site info:', err);
+      }
+    };
+    fetchSiteInfo();
+  }, []);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -53,8 +69,8 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center group">
           <img
-            src="/shivgroup/images/Logo.png"
-            alt="Shiv Group"
+            src={siteInfo?.company_logo || "/shivgroup/images/Logo.png"}
+            alt={siteInfo?.company_name || "Shiv Group"}
             className={`w-auto object-contain transition-all duration-500 ease-out ${
               isScrolled ? 'h-10 md:h-[64px]' : 'h-12 md:h-[82px]'
             }`}
@@ -82,18 +98,20 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           <div className="hidden md:flex items-center gap-2 text-[#111111]">
             <a
-              href="tel:+911234567890"
+              href={`tel:${siteInfo?.mobile || "+911234567890"}`}
               className="flex items-center gap-2 text-[#111111]"
             >
-              <span className="text-[16px] lg:text-[20px] xl:text-[24px] font-heading leading-none font-semibold">+91 123 456 7890</span>
+              <span className="text-[16px] lg:text-[20px] xl:text-[24px] font-heading leading-none font-semibold">
+                {siteInfo?.mobile || "+91 123 456 7890"}
+              </span>
             </a>
-            <Link to="/" className="w-[36px] h-[36px] md:w-[40px] md:h-[40px] rounded-full bg-[#1f5ea8] flex items-center justify-center">
+            <div className="w-[36px] h-[36px] md:w-[40px] md:h-[40px] rounded-full bg-[#1f5ea8] flex items-center justify-center">
               <img
                 src="/shivgroup/images/call-white-icon.svg"
-                alt="Shiv Group"
+                alt="Call"
                 className="h-[18px] md:h-[20px] w-auto object-contain"
               />
-            </Link>
+            </div>
           </div>
 
 
@@ -146,13 +164,13 @@ const Navbar = () => {
                 className="mt-6 pt-8 border-t border-[#f0f0f0]"
               >
                 <a
-                  href="tel:+911234567890"
+                  href={`tel:${siteInfo?.mobile || "+911234567890"}`}
                   className="inline-flex items-center gap-4 text-[#111111]"
                 >
                   <span className="w-12 h-12 rounded-full bg-[#1f5ea8] flex items-center justify-center">
                     <FiPhone className="text-white text-lg" />
                   </span>
-                  <span className="text-xl font-bold">+91 123 456 7890</span>
+                  <span className="text-xl font-bold">{siteInfo?.mobile || "+91 123 456 7890"}</span>
                 </a>
               </motion.div>
             </div>

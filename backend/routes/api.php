@@ -25,6 +25,16 @@ Route::prefix('v1')->group(function () {
     Route::get('get-partners', [PartnersController::class, 'getPartners']);
     Route::get('get-testimonials', [TestimonialsController::class, 'testimonials']);
     Route::get('get-latest-service', [ServicesController::class,'latestService']);
+    Route::get('get-letest-services', [ServicesController::class, 'latestService']);
+    Route::get('get-services', [ServicesController::class, 'getServices']);
+    Route::get('get-service-data-by-id/{id}', [ServicesController::class, 'getServiceDataById']);
+    Route::get('all-project-categories', [ProjectCategoriesController::class,'getAllProjectCategories']);
+    Route::get('get-projects', [ProjectsController::class, 'getPublicProjects']);
+    Route::get('get-project-details/{hash}', [ProjectsController::class,'getProjectDetails']);
+    Route::get('all-about-us-year', [AboutUsController::class, 'getAllAboutUsYear']);
+    Route::get('get-about-us-data-by-id/{id}', [AboutUsController::class, 'getAboutUsDataById']);
+    Route::get('get-site-info', [GeneralInformationController::class, 'getGeneralInfo']);
+    Route::get('get-social-links', [SocialMediaController::class, 'getSocialMediaLinks']);
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('logout', [UsersController::class, 'logout']);

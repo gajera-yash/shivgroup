@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\v1;
 use App\Http\Controllers\Controller;
 use App\Models\ProjectCategories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
 class ProjectCategoriesController extends Controller
@@ -113,6 +114,28 @@ class ProjectCategoriesController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getAllProjectCategories(){
+        try {
+            $category = ProjectCategories::where('status', 1)->orderBy('id', 'desc')->get();
+
+            foreach ($category as $cate) {
+                $cate->hash = Crypt::encrypt($cate->id);
+                unset($cate->id);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Project categories retrieved successfully',
+                'data' => $category,
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),

@@ -14,7 +14,7 @@ class GeneralInformationController extends Controller
     {
         try {
             $generalInformation = GeneralInformation::first();
-            
+
             return response()->json([
                 'status' => true,
                 'message' => 'General information fetched successfully',
@@ -51,7 +51,7 @@ class GeneralInformationController extends Controller
         DB::beginTransaction();
         try {
             $generalInformation = GeneralInformation::first();
-            
+
             $data = [
                 'company_name' => $request->company_name,
                 'tagline' => $request->tagline,
@@ -88,6 +88,39 @@ class GeneralInformationController extends Controller
                 'status' => false,
                 'message' => 'Failed to save general information',
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getGeneralInfo()
+    {
+        try {
+            $generalInformation = GeneralInformation::first();
+
+            if (!$generalInformation) {
+                return response()->json([
+                    'company_name' => null,
+                    'tagline' => null,
+                    'mobile' => null,
+                    'email' => null,
+                    'address' => null,
+                    'company_logo' => null,
+                ]);
+            }
+
+            return response()->json([
+                'company_name' => $generalInformation->company_name ?? null,
+                'tagline' => $generalInformation->tagline ?? null,
+                'mobile' => $generalInformation->mobile ?? null,
+                'email' => $generalInformation->email ?? null,
+                'address' => $generalInformation->address ?? null,
+                'company_logo' => $generalInformation->company_logo,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Internal server error',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

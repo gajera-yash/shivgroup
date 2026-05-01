@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\ProjectPoint;
 use App\Models\ProjectSection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -78,7 +79,7 @@ class ProjectsController extends Controller
 
             if ($request->has('tags')) {
                 $tags = json_decode($request->tags, true);
-                if(json_last_error() !== JSON_ERROR_NONE) {
+                if (json_last_error() !== JSON_ERROR_NONE) {
                     $tags = array_map('trim', explode(',', $request->tags));
                 }
                 $projectData['tags'] = $tags;
@@ -122,11 +123,11 @@ class ProjectsController extends Controller
             // Handle Project Sections
             if ($request->has('project_sections')) {
                 $submittedSectionIds = collect($request->project_sections)->pluck('id')->filter()->toArray();
-                
+
                 $sectionsToDelete = ProjectSection::where('project_id', $project->id)
                     ->whereNotIn('id', $submittedSectionIds)
                     ->get();
-                    
+
                 foreach ($sectionsToDelete as $sec) {
                     $path = $sec->getRawOriginal('section_image');
                     if ($path && Storage::disk('public')->exists($path)) {
@@ -180,7 +181,6 @@ class ProjectsController extends Controller
                 'message' => $editId ? 'Project updated successfully.' : 'Project added successfully.',
                 'data' => $project->load(['points', 'sections']),
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -246,6 +246,67 @@ class ProjectsController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getPublicProjects(Request $request)
+    {
+        $request->validate([
+            'category' => 'nullable|string',
+        ]);
+
+        try {
+
+            $query = Project::where('status', 1);
+            if ($request->category && $request->category !== 'all') {
+                $categoryId = Crypt::decrypt($request->category);
+                $query->where('project_category_id', $categoryId);
+            }
+
+            $projects = $query->orderBy('id', 'desc')->get();
+
+            foreach ($projects as $project) {
+                $project->hash = Crypt::encrypt($project->id);
+                unset($project->id);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Projects retrieved successfully.',
+                'data' => $projects,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getProjectDetails($hash)
+    {
+        try {
+            $id = Crypt::decrypt($hash);
+            $project = Project::with(['points', 'sections'])->find($id);
+
+            if (!$project) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Project record not found.',
+                    'data' => null,
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Project details retrieved successfully.',
+                'data' => $project,
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),

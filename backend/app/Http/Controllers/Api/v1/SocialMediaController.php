@@ -60,4 +60,22 @@ class SocialMediaController extends Controller
             ], 500);
         }
     }
+
+    public function getSocialMediaLinks()
+    {
+        try {
+            $socials = SocialMedia::all();
+            return response()->json([
+                'status' => true,
+                'message' => 'Social media links fetched successfully',
+                'data' => $socials,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch social media links',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

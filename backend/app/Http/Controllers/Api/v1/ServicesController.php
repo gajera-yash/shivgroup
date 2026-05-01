@@ -9,6 +9,7 @@ use App\Models\ServiceRule;
 use App\Models\Services;
 use App\Models\Subservices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -63,16 +64,16 @@ class ServicesController extends Controller
             'full_description' => 'required|string',
             'service_image' => $editId ? 'nullable|image|mimes:jpg,jpeg,png,webp' : 'required|image|mimes:jpg,jpeg,png,webp',
             'status' => 'required|in:1,0',
-            
+
             'subservice' => 'required|array|min:1',
             'subservice.*.description' => 'required|string',
-            
+
             'service_rules' => 'required|array|min:1',
             'service_rules.*.rule' => 'required|string',
-            
+
             'brochures' => 'required|array|min:1',
             'brochures.*.brochure_file' => $editId ? 'nullable|file|mimes:pdf,doc,docx|max:10240' : 'required|file|mimes:pdf,doc,docx|max:10240',
-            
+
             'service_contents' => 'required|array|min:1',
             'service_contents.*.title' => 'required|string',
             'service_contents.*.description' => 'required|string',
@@ -151,7 +152,8 @@ class ServicesController extends Controller
                     if ($existingBro && $brochure_file && Storage::disk('public')->exists($brochure_file)) {
                         Storage::disk('public')->delete($brochure_file);
                     }
-                    $brochure_file = $request->file("brochures.$idx.brochure_file")->store('brochures', 'public');
+                    $file = $request->file("brochures.$idx.brochure_file");
+                    $brochure_file = $file->storeAs('brochures', $file->getClientOriginalName(), 'public');
                 }
 
                 $b = Brochures::updateOrCreate(
@@ -283,18 +285,58 @@ class ServicesController extends Controller
     public function latestService()
     {
         try {
-            $service = Services::with('subservices')->orderBy('id', 'desc')->where('status', 1)->first();
-            if (!$service) {
-                return response()->json([
-                    "status" => true,
-                    "message" => "No service found.",
-                    "data" => null
-                ], 200);
+            $services = Services::with('subservices')->where('status', 1)->orderBy('id', 'desc')->limit(4)->get();
+
+            foreach ($services as $service) {
+                $service->hash = Crypt::encrypt($service->id);
+                unset($service->id);
             }
 
             return response()->json([
                 'status' => true,
-                'message' => 'Latest service retrieved successfully.',
+                'message' => 'Services retrieved successfully.',
+                'data' => $services,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getServices()
+    {
+        try {
+            $services = Services::with('subservices')->where('status', 1)->orderBy('id', 'desc')->get();
+
+            foreach ($services as $service) {
+                $service->hash = Crypt::encrypt($service->id);
+                unset($service->id);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Services retrieved successfully.',
+                'data' => $services,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getServiceDataById($id)
+    {
+        try {
+            $sId = Crypt::decrypt($id);
+            $service = Services::with(['subservices', 'service_rules', 'service_contents', 'brochures'])->where('status', 1)->where('id', $sId)->first();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Service retrieved successfully.',
                 'data' => $service,
             ], 200);
         } catch (\Exception $e) {

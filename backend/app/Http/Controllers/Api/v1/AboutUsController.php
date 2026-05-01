@@ -162,4 +162,47 @@ class AboutUsController extends Controller
             ], 500);
         }
     }
+
+    public function getAllAboutUsYear()
+    {
+        try {
+            $about_us = AboutUs::where('status', 1)->orderBy('year', 'asc')->get(['id', 'year']);
+
+            return response()->json([
+                "status" => true,
+                "message" => "Years fetched successfully.",
+                "data" => $about_us,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Internal Server Error",
+            ], 500);
+        }
+    }
+
+    public function getAboutUsDataById($id)
+    {
+        try {
+            $about_us = AboutUs::with('aboutUsImages')->find($id);
+
+            if (!$about_us) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Record not found.",
+                ], 404);
+            }
+
+            return response()->json([
+                "status" => true,
+                "message" => "Data fetched successfully.",
+                "data" => $about_us,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Internal Server Error",
+            ], 500);
+        }
+    }
 }
