@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
     Route::get('get-services', [ServicesController::class, 'getServices']);
     Route::get('get-service-data-by-id/{id}', [ServicesController::class, 'getServiceDataById']);
     Route::get('all-project-categories', [ProjectCategoriesController::class,'getAllProjectCategories']);
+    Route::get('categories-with-latest-project', [ProjectCategoriesController::class, 'getCategoriesWithLatestProject']);
     Route::get('get-projects', [ProjectsController::class, 'getPublicProjects']);
     Route::get('get-project-details/{hash}', [ProjectsController::class,'getProjectDetails']);
     Route::get('all-about-us-year', [AboutUsController::class, 'getAllAboutUsYear']);

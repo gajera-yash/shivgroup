@@ -87,10 +87,10 @@ const sliderItems = [
 
 const AboutShowcaseSection = () => {
   return (
-    <section className="w-full bg-[#f5f5f5] py-16 md:py-20 overflow-hidden"  style={{
-        paddingTop: '100px',
-        paddingBottom: '100px',
-      }}>
+    <section className="w-full bg-[#f5f5f5] py-16 md:py-20 overflow-hidden" style={{
+      paddingTop: '100px',
+      paddingBottom: '100px',
+    }}>
       <div className="mx-auto w-full max-w-[1920px] px-4 md:px-8 lg:px-12 mb-20">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10 align-items-center">
           <h2 className="lg:col-span-9 font-heading text-[36px] leading-[1.05] font-bold text-black md:text-[46px] lg:text-[56px]">
@@ -114,11 +114,17 @@ const AboutShowcaseSection = () => {
       <div className="relative mt-10">
         <Swiper
           modules={[Autoplay]}
-          loop
-          speed={900}
-          autoplay={{ delay: 3200, disableOnInteraction: false }}
+          loop={true}
+          speed={1000}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true
+          }}
           spaceBetween={16}
           slidesPerView="auto"
+          observer={true}
+          observeParents={true}
           className="px-4 md:px-8 lg:px-12"
         >
           {sliderItems.map((item, index) => (
@@ -129,29 +135,27 @@ const AboutShowcaseSection = () => {
                 </div>
               ) : (
                 <div
-                  className={`flex h-[320px] w-full flex-col justify-between p-7 md:p-8 ${
-                    item.type === 'darkStat'
+                  className={`flex h-[320px] w-full flex-col justify-between p-7 md:p-8 ${item.type === 'darkStat'
                       ? 'bg-[#121212] text-white'
                       : item.type === 'primaryStat'
                         ? 'bg-primary text-white'
                         : 'bg-[#e6e5db] text-[#111111] '
-                  }`}
+                    }`}
                 >
                   <div>
                     <p className="font-heading font-bold text-[56px] leading-none">{item.value}</p>
                     <p className="!mt-3 font-heading font-semibold text-[24px] leading-none">{item.title}</p>
                   </div>
                   <p
-                    className={`max-w-[95%] text-[15px] leading-[1.55] ${
-                      item.type === 'darkStat' || item.type === 'primaryStat'
+                    className={`max-w-[95%] text-[15px] leading-[1.55] ${item.type === 'darkStat' || item.type === 'primaryStat'
                         ? 'text-white/90'
                         : 'text-[#3d3d3d]'
-                    }`}
+                      }`}
                   >
                     {item.description}
                   </p>
                 </div>
-                
+
               )}
             </SwiperSlide>
           ))}

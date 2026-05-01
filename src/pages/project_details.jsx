@@ -109,17 +109,10 @@ const ProjectDetails = () => {
                                     <h3 className="font-heading text-[24px] font-bold uppercase mb-[25px] tracking-wider text-black">
                                         See Project Location
                                     </h3>
-                                    <div className="w-full rounded-[4px] overflow-hidden border border-[#eee]">
-                                        <iframe
-                                            src={projectData.map_link}
-                                            width="100%"
-                                            height="300"
-                                            style={{ border: 0 }}
-                                            allowFullScreen=""
-                                            loading="lazy"
-                                            referrerPolicy="no-referrer-when-downgrade"
-                                        ></iframe>
-                                    </div>
+                                    <div
+                                        className="w-full rounded-[4px] overflow-hidden border border-[#eee] [&>iframe]:w-full [&>iframe]:h-[300px]"
+                                        dangerouslySetInnerHTML={{ __html: projectData.map_link }}
+                                    />
                                 </div>
                             )}
                         </aside>

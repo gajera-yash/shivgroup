@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project;
 use App\Models\ProjectCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -134,6 +135,40 @@ class ProjectCategoriesController extends Controller
                 'status' => true,
                 'message' => 'Project categories retrieved successfully',
                 'data' => $category,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function getCategoriesWithLatestProject()
+    {
+        try {
+            $categories = ProjectCategories::where('status', 1)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            foreach ($categories as $category) {
+                // Get only the latest active project for this category
+                $latestProject = Project::where('project_category_id', $category->id)
+                    ->where('status', 1)
+                    ->orderBy('id', 'desc')
+                    ->first();
+
+                if ($latestProject) {
+                    $latestProject->hash_id = Crypt::encrypt($latestProject->id);
+                }
+
+                $category->latest_project = $latestProject;
+                $category->hash = Crypt::encrypt($category->id);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Categories with latest projects retrieved successfully',
+                'data' => $categories,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

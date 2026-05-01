@@ -1,36 +1,12 @@
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const projects = [
-  {
-    id: 1,
-    title: 'HARBORLINE STUDIOS',
-    image: '/shivgroup/images/project/project-1.jpg',
-    path: '/projects/harborline'
-  },
-  {
-    id: 2,
-    title: 'CENTRAL DISTRICT TOWER',
-    image: '/shivgroup/images/project/project-2.jpg',
-    path: '/projects/tower'
-  },
-  {
-    id: 3,
-    title: 'RIVERSIDE EXCHANGE',
-    image: '/shivgroup/images/project/project-3.jpg',
-    path: '/projects/riverside'
-  },
-  {
-    id: 4,
-    title: 'PARKVIEW QUARTER',
-    image: '/shivgroup/images/project/project-1.jpg',
-    path: '/projects/parkview'
-  }
-];
+import api from '../utils/api';
 
 const RecentProjects = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // Scroll animation logic for the title
   const targetRef = useRef(null);
@@ -41,13 +17,44 @@ const RecentProjects = () => {
 
   const fillWidth = useTransform(scrollYProgress, [0.1, 0.4], ["0%", "100%"]);
 
+  useEffect(() => {
+    const fetchRecentProjects = async () => {
+      try {
+        const res = await api.get('categories-with-latest-project');
+        if (res.data?.status) {
+          // Filter out categories that have no projects
+          const validCategories = (res.data.data || []).filter(cat => cat.latest_project);
+          setCategories(validCategories);
+        }
+      } catch (err) {
+        console.error('Failed to fetch recent projects:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecentProjects();
+  }, []);
+
   // Autoplay for the slider
   useEffect(() => {
+    if (categories.length === 0) return;
+    
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % projects.length);
-    }, 4000);
+      setActiveIndex((prev) => (prev + 1) % categories.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [categories]);
+
+  if (loading) {
+    return <div className="h-[500px] flex items-center justify-center font-heading text-2xl text-dark/20 animate-pulse">LOADING RECENT PROJECTS...</div>;
+  }
+
+  if (categories.length === 0) {
+    return null;
+  }
+
+  const currentCategory = categories[activeIndex];
+  const currentProject = currentCategory.latest_project;
 
   return (
     <section 
@@ -87,8 +94,8 @@ const RecentProjects = () => {
               className="absolute inset-0"
             >
               <img 
-                src={projects[activeIndex].image} 
-                alt={projects[activeIndex].title} 
+                src={currentProject.project_image} 
+                alt={currentProject.title} 
                 className="w-full h-full object-cover"
               />
               {/* Overlay Gradient */}
@@ -98,18 +105,18 @@ const RecentProjects = () => {
 
           {/* Top Right Navigation Tabs */}
           <div className="absolute top-8 right-8 z-10 hidden md:block">
-            <div className="bg-[#5A7F99] backdrop-blur-md border border-white/20 rounded-full px-2 py-1.5 flex items-center project_tabs">
-              {projects.map((project, index) => (
+            <div className="bg-[#5A7F99] backdrop-blur-md border border-white/20 rounded-full px-2 py-1.5 flex items-center project_tabs overflow-x-auto max-w-full">
+              {categories.map((category, index) => (
                 <button
-                  key={project.id}
+                  key={category.hash}
                   onClick={() => setActiveIndex(index)}
-                  className={`px-6 py-2 font-body text-sm font-medium transition-all duration-600 relative ${
+                  className={`px-6 py-2 font-body text-sm font-medium transition-all duration-600 relative whitespace-nowrap ${
                     index === activeIndex 
                       ? 'text-white' 
                       : 'text-white/60 hover:text-white'
                   }`}
                 >
-                  <span className="relative z-10">{project.title.toLowerCase().split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')}</span>
+                  <span className="relative z-10">{category.category_name}</span>
                   {index === activeIndex && (
                     <motion.div
                       layoutId="activeTab"
@@ -117,7 +124,7 @@ const RecentProjects = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 1 }}
                     />
                   )}
-                  {index < projects.length - 1 && (
+                  {index < categories.length - 1 && (
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[1px] h-4 bg-white/20" />
                   )}
                 </button>
@@ -136,12 +143,12 @@ const RecentProjects = () => {
               className="absolute bottom-10 left-8 md:left-12 flex flex-col gap-6 z-10"
             >
               <h3 className="font-heading text-white text-[42px] md:text-[62px] lg:text-[84px] font-bold uppercase tracking-tight leading-[0.9]">
-                {projects[activeIndex].title}
+                {currentProject.title}
               </h3>
 
               <div className="flex flex-wrap gap-4 button_group">
                 <Link
-                  to={projects[activeIndex].path}
+                  to={`/project-details/${currentProject.hash_id}`}
                   className="bg-[#AB2F2F] text-white flex items-center gap-2 pl-1 pr-8 py-1 rounded-full font-heading font-bold uppercase tracking-wider text-base transition-all duration-300 hover:bg-[#8B2424] group shadow-xl"
                 >
                   <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center transition-transform group-hover:rotate-45">
