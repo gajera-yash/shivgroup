@@ -51,9 +51,6 @@ const InquiryManager = () => {
         <div className="flex items-center gap-2">
            <h2 className="text-lg font-bold text-slate-800">Inquiries</h2>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 self-start">
-          <HiOutlineDownload className="w-4 h-4" /> Export CSV
-        </button>
       </motion.div>
 
       {isLoading ? (

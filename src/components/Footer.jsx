@@ -96,7 +96,7 @@ const Footer = () => {
                   {siteInfo?.email || "shivgroup@yahoo.co.in"}
                 </a>
                 <a href={`tel:${siteInfo?.mobile || "+911234567890"}`} className="font-body text-base text-left lg:text-end text-black/80 font-bold hover:text-primary transition-colors">
-                  {siteInfo?.mobile || "+91 123 456 7890"}
+                  +91 {siteInfo?.mobile || "+91 123 456 7890"}
                 </a>
               </div>
             </div>

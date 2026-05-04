@@ -102,7 +102,7 @@ const Navbar = () => {
               className="flex items-center gap-2 text-[#111111]"
             >
               <span className="text-[16px] lg:text-[20px] xl:text-[24px] font-heading leading-none font-semibold">
-                {siteInfo?.mobile || "+91 123 456 7890"}
+                +91 {siteInfo?.mobile || "+91 123 456 7890"}
               </span>
             </a>
             <div className="w-[36px] h-[36px] md:w-[40px] md:h-[40px] rounded-full bg-[#1f5ea8] flex items-center justify-center">

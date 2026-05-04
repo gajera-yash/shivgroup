@@ -25,7 +25,7 @@ class InquiriesController extends Controller
     {
         $request->validate([
             "name" => "required|string|max:255",
-            "mobile" => "required|numeric|digits:10",
+            "mobile" => "required|numeric|digits:10|regex:/^[6-9][0-9]{9}$/",
             "email" => "required|email|max:255",
             "subject" => "required|string|max:255",
             "message" => "required|string|min:10",

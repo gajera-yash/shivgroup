@@ -300,7 +300,7 @@ const AddProject = () => {
               <FormInput 
                 label="Google Maps Embed URL" 
                 required
-                placeholder="https://maps.google.com/..." 
+                placeholder={`<iframe src="https://www.google.com/maps/embed?...">`}
                 value={mapLink}
                 onChange={(e) => setMapLink(e.target.value)}
               />
